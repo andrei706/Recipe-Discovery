@@ -4,11 +4,6 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-class RecipeNecessitiesId implements Serializable {
-    private Integer recipe;
-    private Integer ingredient;
-}
-
 @Entity
 @Table(name = "recipe_ingredients")
 @IdClass(RecipeNecessitiesId.class)
@@ -24,7 +19,7 @@ public class RecipeNecessities {
     private Ingredient ingredient;
 
     @Column(nullable = false)
-    private BigDecimal quantity;
+    private int quantity;
 
     public RecipeNecessities() {}
 
@@ -32,6 +27,6 @@ public class RecipeNecessities {
     public void setRecipe(Recipe recipe) { this.recipe = recipe; }
     public Ingredient getIngredient() { return ingredient; }
     public void setIngredient(Ingredient ingredient) { this.ingredient = ingredient; }
-    public BigDecimal getQuantity() { return quantity; }
-    public void setQuantity(BigDecimal quantity) { this.quantity = quantity; }
+    public int getQuantity() { return quantity; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
 }

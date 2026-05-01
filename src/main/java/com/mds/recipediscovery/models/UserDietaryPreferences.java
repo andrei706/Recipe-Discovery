@@ -4,29 +4,9 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
-class UserDietaryPreferenceId implements Serializable {
-    private Integer user;
-    private Integer diet;
-
-    public UserDietaryPreferenceId() {}
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof UserDietaryPreferenceId)) return false;
-        UserDietaryPreferenceId that = (UserDietaryPreferenceId) o;
-        return Objects.equals(user, that.user) && Objects.equals(diet, that.diet);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(user, diet);
-    }
-}
-
 @Entity
 @Table(name = "user_dietary_preferences")
-@IdClass(UserDietaryPreferenceId.class)
+@IdClass(UserDietaryPreferencesId.class)
 public class UserDietaryPreferences {
 
     @Id

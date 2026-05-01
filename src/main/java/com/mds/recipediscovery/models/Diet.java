@@ -14,7 +14,7 @@ public class Diet {
     private String name;
 
     @Column(name = "healthy_score", nullable = false)
-    private BigDecimal healthyScore;
+    private int healthyScore;
 
     public Diet() {}
 
@@ -22,6 +22,6 @@ public class Diet {
     public void setDietId(Integer dietId) { this.dietId = dietId; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-    public BigDecimal getHealthyScore() { return healthyScore; }
-    public void setHealthyScore(BigDecimal healthyScore) { this.healthyScore = healthyScore; }
+    public int getHealthyScore() { return healthyScore; }
+    public void setHealthyScore(int healthyScore) { this.healthyScore = healthyScore; }
 }

@@ -98,13 +98,13 @@ ALTER TABLE user_dietary_preferences ADD CONSTRAINT pk_user_diet PRIMARY KEY (us
 ALTER TABLE user_dietary_preferences ADD CONSTRAINT fk_pref_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE;
 ALTER TABLE user_dietary_preferences ADD CONSTRAINT fk_pref_diet FOREIGN KEY (diet_id) REFERENCES diets(diet_id) ON DELETE CASCADE;
 
--- UTILIZATORI
+
 INSERT INTO users (username, email, password) VALUES ('Andrei', 'andrei@email.com', 'passAndrei1');
 INSERT INTO users (username, email, password) VALUES ('Elena', 'elena@email.com', 'passElena2');
 INSERT INTO users (username, email, password) VALUES ('Cristian', 'cristian@email.com', 'passCristian3');
 INSERT INTO users (username, email, password) VALUES ('Ioana', 'ioana@email.com', 'passIoana4');
 
--- DIETE (cu healthy_score)
+
 INSERT INTO diets (name, healthy_score) VALUES ('Vegan', 95.00);
 INSERT INTO diets (name, healthy_score) VALUES ('Gluten Free', 85.00);
 INSERT INTO diets (name, healthy_score) VALUES ('Keto', 75.00);
@@ -116,7 +116,7 @@ INSERT INTO diets (name, healthy_score) VALUES ('Low Fat', 80.00);
 INSERT INTO diets (name, healthy_score) VALUES ('Carnivore', 60.00);
 INSERT INTO diets (name, healthy_score) VALUES ('Raw Vegan', 98.00);
 
--- INGREDIENTE (unități corectate conform CHECK constraint)
+
 INSERT INTO ingredients (name, measurement_unit) VALUES ('Chicken Breast', 'grams');
 INSERT INTO ingredients (name, measurement_unit) VALUES ('Brown Rice', 'grams');
 INSERT INTO ingredients (name, measurement_unit) VALUES ('Broccoli', 'grams');
@@ -170,7 +170,7 @@ INSERT INTO ingredients (name, measurement_unit) VALUES ('Oats', 'grams');
 INSERT INTO ingredients (name, measurement_unit) VALUES ('Kale', 'grams');
 INSERT INTO ingredients (name, measurement_unit) VALUES ('Turkey Breast', 'grams');
 
--- REȚETE (fără healthy_score)
+
 INSERT INTO recipes (name, total_prep_time_minutes, calories_kcal, fats_g, saturated_fats_g, carbohydrates_g, sugars_g, proteins_g, salt_g) VALUES ('Chicken with Rice and Broccoli', 35, 450.00, 10.50, 2.00, 45.00, 3.00, 42.00, 1.20);
 INSERT INTO recipes (name, total_prep_time_minutes, calories_kcal, fats_g, saturated_fats_g, carbohydrates_g, sugars_g, proteins_g, salt_g) VALUES ('Baked Salmon with Asparagus', 25, 520.00, 35.00, 6.00, 8.00, 2.50, 45.00, 1.50);
 INSERT INTO recipes (name, total_prep_time_minutes, calories_kcal, fats_g, saturated_fats_g, carbohydrates_g, sugars_g, proteins_g, salt_g) VALUES ('Avocado Toast with Egg', 10, 380.00, 22.00, 4.50, 30.00, 2.00, 16.00, 0.80);
@@ -193,7 +193,7 @@ INSERT INTO recipes (name, total_prep_time_minutes, calories_kcal, fats_g, satur
 INSERT INTO recipes (name, total_prep_time_minutes, calories_kcal, fats_g, saturated_fats_g, carbohydrates_g, sugars_g, proteins_g, salt_g) VALUES ('Chicken Fajitas', 25, 450.00, 15.00, 3.00, 20.00, 5.00, 48.00, 1.60);
 INSERT INTO recipes (name, total_prep_time_minutes, calories_kcal, fats_g, saturated_fats_g, carbohydrates_g, sugars_g, proteins_g, salt_g) VALUES ('Homemade Hummus', 10, 220.00, 14.00, 2.00, 20.00, 1.00, 8.00, 0.80);
 
--- INGREDIENTE REȚETE (recipe_ingredients)
+
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity) VALUES (1, 1, 200);
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity) VALUES (1, 2, 80);
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity) VALUES (1, 3, 150);
@@ -261,7 +261,6 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity) VALUES (21, 
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity) VALUES (21, 9, 1);
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity) VALUES (21, 5, 2);
 
--- CLASIFICĂRI DIETE REȚETE (recipe_diet_classifications)
 INSERT INTO recipe_diet_classifications (recipe_id, diet_id) VALUES (1, 2);
 INSERT INTO recipe_diet_classifications (recipe_id, diet_id) VALUES (2, 3);
 INSERT INTO recipe_diet_classifications (recipe_id, diet_id) VALUES (3, 4);
@@ -291,7 +290,6 @@ INSERT INTO recipe_diet_classifications (recipe_id, diet_id) VALUES (20, 6);
 INSERT INTO recipe_diet_classifications (recipe_id, diet_id) VALUES (21, 1);
 INSERT INTO recipe_diet_classifications (recipe_id, diet_id) VALUES (21, 2);
 
--- PREFERINȚE DIETETICE UTILIZATORI (user_dietary_preferences)
 INSERT INTO user_dietary_preferences (user_id, diet_id) VALUES (1, 5);
 INSERT INTO user_dietary_preferences (user_id, diet_id) VALUES (2, 3);
 INSERT INTO user_dietary_preferences (user_id, diet_id) VALUES (3, 4);
@@ -301,7 +299,6 @@ INSERT INTO user_dietary_preferences (user_id, diet_id) VALUES (2, 8);
 INSERT INTO user_dietary_preferences (user_id, diet_id) VALUES (3, 9);
 INSERT INTO user_dietary_preferences (user_id, diet_id) VALUES (4, 10);
 
--- INVENTAR UTILIZATORI (inventory)
 INSERT INTO inventory (user_id, ingredient_id, quantity) VALUES (1, 1, 500);
 INSERT INTO inventory (user_id, ingredient_id, quantity) VALUES (1, 2, 1000);
 INSERT INTO inventory (user_id, ingredient_id, quantity) VALUES (1, 4, 250);

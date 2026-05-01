@@ -15,19 +15,19 @@ public class Recipe {
     private String name;
 
     @Column(name = "total_prep_time_minutes")
-    private Integer totalPrepTimeMinutes;
+    private int totalPrepTimeMinutes;
 
     @Column(name = "calories_kcal", nullable = false)
-    private BigDecimal caloriesKcal;
+    private float caloriesKcal;
 
     @Column(name = "fats_g", nullable = false)
-    private BigDecimal fatsG;
+    private float fatsG;
 
     @Column(name = "proteins_g", nullable = false)
-    private BigDecimal proteinsG;
+    private float proteinsG;
 
     @Column(name = "carbohydrates_g", nullable = false)
-    private BigDecimal carbohydratesG;
+    private float carbohydratesG;
 
     @ManyToMany
     @JoinTable(
@@ -40,8 +40,9 @@ public class Recipe {
     public Recipe() {}
 
     public Integer getRecipeId() { return recipeId; }
+    public void setRecipeId(Integer recipeId) { this.recipeId = recipeId; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-    public BigDecimal getCaloriesKcal() { return caloriesKcal; }
-    public void setCaloriesKcal(BigDecimal caloriesKcal) { this.caloriesKcal = caloriesKcal; }
+    public float getCaloriesKcal() { return caloriesKcal; }
+    public void setCaloriesKcal(float caloriesKcal) { this.caloriesKcal = caloriesKcal; }
 }
