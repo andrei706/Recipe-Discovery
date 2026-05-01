@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface InventoryRepository extends JpaRepository<Inventory, InventoryId> {
     List<Inventory> findByUser(User user);
     Optional<Inventory> findByUserAndIngredient(User user, Ingredient ingredient);
+    List<Inventory> findByUserAndIngredientIn(User user, List<Ingredient> ingredients);
 }
