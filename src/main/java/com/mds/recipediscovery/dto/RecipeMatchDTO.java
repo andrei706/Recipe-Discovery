@@ -13,7 +13,6 @@ public class RecipeMatchDTO {
         this.matchedIngredients = matchedIngredients;
         this.totalIngredients = totalIngredients;
         if (totalIngredients > 0) {
-            // Calculează procentul cu două zecimale
             this.matchPercentage = Math.round((double) matchedIngredients / totalIngredients * 100.0 * 100.0) / 100.0;
         } else {
             this.matchPercentage = 100.0;

@@ -1,0 +1,50 @@
+package com.mds.recipediscovery.controller;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import org.springframework.test.context.TestPropertySource;
+
+@SpringBootTest(properties = "spring.main.allow-bean-definition-overriding=true")
+@AutoConfigureMockMvc
+class RecipeControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Test
+    void testGetAvailableRecipes() throws Exception {
+        mockMvc.perform(get("/api/recipes/available"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void testGetRecipesSortedByMatchingIngredients() throws Exception {
+        mockMvc.perform(get("/api/recipes/sorted-by-match"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void testGetRecipesWithMatchPercentage() throws Exception {
+        mockMvc.perform(get("/api/recipes/match-percentage"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void testCookRecipe() throws Exception {
+        mockMvc.perform(post("/api/recipes/1/cook"))
+                .andExpect(result -> {
+                    int status = result.getResponse().getStatus();
+                    assertTrue(status == 200 || status == 400, "Expected status 200 or 400, but was " + status);
+                });
+    }
+}
