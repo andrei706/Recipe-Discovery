@@ -11,7 +11,7 @@ CREATE TABLE users (
                        user_id INT AUTO_INCREMENT PRIMARY KEY,
                        username VARCHAR(50) NOT NULL,
                        email VARCHAR(100) NOT NULL,
-                       password VARCHAR(32) NOT NULL
+                       password VARCHAR(255) NOT NULL
 ) ENGINE=InnoDB;
 
 ALTER TABLE users ADD CONSTRAINT uq_user_email UNIQUE (email);
@@ -99,10 +99,10 @@ ALTER TABLE user_dietary_preferences ADD CONSTRAINT fk_pref_user FOREIGN KEY (us
 ALTER TABLE user_dietary_preferences ADD CONSTRAINT fk_pref_diet FOREIGN KEY (diet_id) REFERENCES diets(diet_id) ON DELETE CASCADE;
 
 
-INSERT INTO users (username, email, password) VALUES ('Andrei', 'andrei@email.com', 'passAndrei1');
-INSERT INTO users (username, email, password) VALUES ('Elena', 'elena@email.com', 'passElena2');
-INSERT INTO users (username, email, password) VALUES ('Cristian', 'cristian@email.com', 'passCristian3');
-INSERT INTO users (username, email, password) VALUES ('Ioana', 'ioana@email.com', 'passIoana4');
+INSERT INTO users (username, email, password) VALUES ('Andrei', 'andrei@email.com', '$2a$10$r8hu2ouoWg7FA1ZhjhXnquYyueFogOE3c36YPFM.IpyKJx.Pf66QG');
+INSERT INTO users (username, email, password) VALUES ('Elena', 'elena@email.com', '$2a$10$F5pKo53umejJubg0oaw8deqmXJNtXykitAky373FHX1GLXeqpEQpe');
+INSERT INTO users (username, email, password) VALUES ('Cristian', 'cristian@email.com', '$2a$10$kfJzG42OzoS66IqBdEj5d.nVPe3v8OgKKYXjzDR6egtfYgzj1wKrm');
+INSERT INTO users (username, email, password) VALUES ('Ioana', 'ioana@email.com', '$2a$10$myK1Gn0e0GT8fsWTbzKDYuKELmb5lAXYhri3mH1WwlLTpxX3/FPYK');
 
 
 INSERT INTO diets (name, healthy_score) VALUES ('Vegan', 95.00);
