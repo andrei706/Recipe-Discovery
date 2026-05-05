@@ -1,11 +1,14 @@
 package com.mds.recipediscovery.controller;
 
+import com.mds.recipediscovery.dto.InventoryItemDTO;
 import com.mds.recipediscovery.models.Inventory;
 import com.mds.recipediscovery.services.InventoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
@@ -59,6 +62,11 @@ public class InventoryController {
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @GetMapping
+    public ResponseEntity<List<InventoryItemDTO>> getInventory(Authentication authentication) {
+        return ResponseEntity.ok(inventoryService.getInventoryForUser(getCurrentUserId(authentication)));
     }
 
     private Integer getCurrentUserId(Authentication authentication) {

@@ -1,6 +1,7 @@
 package com.mds.recipediscovery.controller;
 
 import com.mds.recipediscovery.dto.RecipeMatchDTO;
+import com.mds.recipediscovery.dto.RecipeMatchDetailsDTO;
 import com.mds.recipediscovery.models.Recipe;
 import com.mds.recipediscovery.services.RecipeService;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,11 @@ public class RecipeController {
     @GetMapping("/match-percentage")
     public ResponseEntity<List<RecipeMatchDTO>> getRecipesWithMatchPercentage(Authentication authentication) {
         return ResponseEntity.ok(recipeService.getRecipesWithMatchPercentage(getCurrentUserId(authentication)));
+    }
+
+    @GetMapping("/details")
+    public ResponseEntity<List<RecipeMatchDetailsDTO>> getRecipeDetails(Authentication authentication) {
+        return ResponseEntity.ok(recipeService.getRecipeDetailsWithInventory(getCurrentUserId(authentication)));
     }
 
     @PostMapping("/{recipeId}/cook")

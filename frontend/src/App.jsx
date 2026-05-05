@@ -1,0 +1,27 @@
+import { Navigate, Route, Routes } from "react-router-dom";
+import TopBar from "./components/TopBar.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import RecipesPage from "./pages/RecipesPage.jsx";
+import InventoryPage from "./pages/InventoryPage.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
+import ProtectedRoute from "./routes/ProtectedRoute.jsx";
+
+export default function App() {
+  return (
+    <div className="app-shell">
+      <TopBar />
+      <div className="app-content">
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<RecipesPage />} />
+            <Route path="/inventory" element={<InventoryPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
+    </div>
+  );
+}
+

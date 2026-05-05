@@ -80,34 +80,7 @@ class RecipeServiceTest {
         Inventory invEggs = new Inventory(testUser, eggs, 2);
         when(inventoryRepository.findByUser(testUser)).thenReturn(Arrays.asList(invFlour, invEggs));
 
-        when(recipeRepository.findAll()).thenReturn(Arrays.asList(pancake, cake));
-
-        RecipeNecessities req1 = new RecipeNecessities();
-        req1.setRecipe(pancake);
-        req1.setIngredient(flour);
-        req1.setQuantity(200);
-
-        RecipeNecessities req2 = new RecipeNecessities();
-        req2.setRecipe(pancake);
-        req2.setIngredient(eggs);
-        req2.setQuantity(2);
-
-        RecipeNecessities req3 = new RecipeNecessities();
-        req3.setRecipe(cake);
-        req3.setIngredient(flour);
-        req3.setQuantity(300);
-
-        RecipeNecessities req4 = new RecipeNecessities();
-        req4.setRecipe(cake);
-        req4.setIngredient(eggs);
-        req4.setQuantity(3);
-
-        RecipeNecessities req5 = new RecipeNecessities();
-        req5.setRecipe(cake);
-        req5.setIngredient(sugar);
-        req5.setQuantity(100);
-
-        when(recipeIngredientRepository.findAll()).thenReturn(Arrays.asList(req1, req2, req3, req4, req5));
+        when(recipeRepository.findRecipesUserCanCook(1)).thenReturn(List.of(pancake));
 
         List<Recipe> result = recipeService.findAvailableRecipes(1);
 

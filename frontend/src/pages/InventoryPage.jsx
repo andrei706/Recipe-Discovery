@@ -1,0 +1,211 @@
+import { useEffect, useMemo, useState } from "react";
+import { addIngredient, getInventory, removeIngredient, updateIngredient } from "../api/inventory.js";
+import { getIngredients } from "../api/ingredients.js";
+import { useAuth } from "../context/AuthContext.jsx";
+
+export default function InventoryPage() {
+  const { token } = useAuth();
+  const [status, setStatus] = useState({ type: "", message: "" });
+  const [inventory, setInventory] = useState([]);
+  const [ingredients, setIngredients] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [form, setForm] = useState({ ingredientId: "", quantity: "" });
+  const [editValues, setEditValues] = useState({});
+
+  const selectedIngredient = useMemo(() => {
+    const id = Number(form.ingredientId);
+    return ingredients.find((item) => item.ingredientId === id);
+  }, [ingredients, form.ingredientId]);
+
+  const loadIngredients = async () => {
+    try {
+      const response = await getIngredients(token);
+      setIngredients(response || []);
+    } catch (error) {
+      setStatus({ type: "error", message: error.message });
+    }
+  };
+
+  const loadInventory = async () => {
+    setLoading(true);
+    setStatus({ type: "", message: "" });
+    try {
+      const response = await getInventory(token);
+      const list = response || [];
+      setInventory(list);
+      setEditValues(
+        list.reduce((acc, item) => {
+          acc[item.ingredientId] = String(item.quantity);
+          return acc;
+        }, {})
+      );
+    } catch (error) {
+      setStatus({ type: "error", message: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
+    loadIngredients();
+    loadInventory();
+  }, [token]);
+
+  const handleAddSubmit = async (event) => {
+    event.preventDefault();
+    setStatus({ type: "", message: "" });
+
+    const ingredientId = Number(form.ingredientId);
+    const quantity = Number(form.quantity);
+    if (!ingredientId) {
+      setStatus({ type: "error", message: "Select an ingredient." });
+      return;
+    }
+    if (!Number.isFinite(quantity) || quantity <= 0) {
+      setStatus({ type: "error", message: "Quantity must be a positive number." });
+      return;
+    }
+
+    try {
+      await addIngredient(token, { ingredientId, quantity });
+      setStatus({ type: "success", message: "Ingredient added." });
+      setIsModalOpen(false);
+      setForm({ ingredientId: "", quantity: "" });
+      await loadInventory();
+    } catch (error) {
+      setStatus({ type: "error", message: error.message });
+    }
+  };
+
+  const handleUpdate = async (ingredientId) => {
+    setStatus({ type: "", message: "" });
+    const newQuantity = Number(editValues[ingredientId]);
+    if (!Number.isFinite(newQuantity) || newQuantity < 0) {
+      setStatus({ type: "error", message: "Quantity must be 0 or higher." });
+      return;
+    }
+
+    try {
+      await updateIngredient(token, { ingredientId, newQuantity });
+      setStatus({ type: "success", message: "Quantity updated." });
+      await loadInventory();
+    } catch (error) {
+      setStatus({ type: "error", message: error.message });
+    }
+  };
+
+  const handleRemove = async (ingredientId) => {
+    setStatus({ type: "", message: "" });
+    try {
+      await removeIngredient(token, { ingredientId });
+      setStatus({ type: "success", message: "Ingredient removed." });
+      await loadInventory();
+    } catch (error) {
+      setStatus({ type: "error", message: error.message });
+    }
+  };
+
+  return (
+    <div className="grid" style={{ gap: 20 }}>
+      <div className="section-header">
+        <h2>Inventory</h2>
+        <button type="button" className="primary-btn" onClick={() => setIsModalOpen(true)}>
+          + Add
+        </button>
+      </div>
+
+      {status.message ? (
+        <div className={status.type === "success" ? "success" : "alert"}>{status.message}</div>
+      ) : null}
+
+      {loading ? <div className="card">Loading inventory...</div> : null}
+
+      {!loading && inventory.length === 0 ? (
+        <div className="card">No items in inventory yet.</div>
+      ) : null}
+
+      <div className="grid inventory-grid">
+        {inventory.map((item) => (
+          <div className="card inventory-card" key={item.ingredientId}>
+            <div className="inventory-title">{item.ingredientName}</div>
+            <div className="badge">Unit: {item.measurementUnit}</div>
+            <div className="form-row">
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={editValues[item.ingredientId] ?? ""}
+                onChange={(event) =>
+                  setEditValues((prev) => ({
+                    ...prev,
+                    [item.ingredientId]: event.target.value
+                  }))
+                }
+              />
+              <div className="inventory-actions">
+                <button
+                  type="button"
+                  className="secondary-btn"
+                  onClick={() => handleUpdate(item.ingredientId)}
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  className="danger-btn"
+                  onClick={() => handleRemove(item.ingredientId)}
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {isModalOpen ? (
+        <div className="modal-backdrop" onClick={() => setIsModalOpen(false)}>
+          <div className="modal" onClick={(event) => event.stopPropagation()}>
+            <h3>Add ingredient</h3>
+            <form className="form-row" onSubmit={handleAddSubmit}>
+              <select
+                value={form.ingredientId}
+                onChange={(event) => setForm((prev) => ({ ...prev, ingredientId: event.target.value }))}
+                required
+              >
+                <option value="">Select ingredient</option>
+                {ingredients.map((ingredient) => (
+                  <option key={ingredient.ingredientId} value={ingredient.ingredientId}>
+                    {ingredient.name}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="number"
+                min="1"
+                step="1"
+                placeholder="Quantity"
+                value={form.quantity}
+                onChange={(event) => setForm((prev) => ({ ...prev, quantity: event.target.value }))}
+                required
+              />
+              <div className="badge">Unit: {selectedIngredient?.measurementUnit || "-"}</div>
+              <div className="inventory-actions">
+                <button type="submit" className="primary-btn">
+                  Add
+                </button>
+                <button type="button" className="secondary-btn" onClick={() => setIsModalOpen(false)}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}

@@ -1,0 +1,221 @@
+:root {
+  color-scheme: light;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  color: #1f2937;
+  background: #f7f7f7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.topbar {
+  background: #f28c28;
+  color: #fff;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.topbar .brand {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.topbar nav {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.topbar button {
+  border: none;
+  background: #fff;
+  color: #f28c28;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.app-content {
+  padding: 24px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.grid {
+  display: grid;
+  gap: 16px;
+}
+
+.grid-3 {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.form-row {
+  display: grid;
+  gap: 12px;
+}
+
+.form-row input,
+.form-row select {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+}
+
+.primary-btn {
+  background: #f28c28;
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.secondary-btn {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #fdba74;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.alert {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.success {
+  background: #dcfce7;
+  color: #166534;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.badge {
+  background: #fef3c7;
+  color: #b45309;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: grid;
+  place-items: center;
+  z-index: 20;
+}
+
+.modal {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  width: min(480px, 92vw);
+}
+
+.split-layout {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .split-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.inventory-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.inventory-card {
+  display: grid;
+  gap: 12px;
+}
+
+.inventory-title {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.inventory-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.danger-btn {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.recipe-ingredients {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.recipe-ingredients-title {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.recipe-ingredients ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.recipe-ingredients-empty {
+  color: #6b7280;
+  font-size: 13px;
+}

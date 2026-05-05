@@ -1,10 +1,13 @@
 package com.mds.recipediscovery.services;
 
+import com.mds.recipediscovery.dto.RecipeIngredientStatusDTO;
 import com.mds.recipediscovery.dto.RecipeMatchDTO;
+import com.mds.recipediscovery.dto.RecipeMatchDetailsDTO;
 import com.mds.recipediscovery.models.*;
 import com.mds.recipediscovery.repository.*;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -97,5 +100,61 @@ public class RecipeService {
                 inventoryRepository.save(inventory);
             }
         }
+    }
+
+    public List<RecipeMatchDetailsDTO> getRecipeDetailsWithInventory(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return recipeRepository.findAll().stream()
+                .map(recipe -> {
+                    List<RecipeNecessities> requirements = recipeIngredientRepository.findByRecipe(recipe);
+                    if (requirements.isEmpty()) {
+                        return new RecipeMatchDetailsDTO(recipe, 0, 0, 100.0, List.of());
+                    }
+
+                    List<Ingredient> neededIngredients = requirements.stream()
+                            .map(RecipeNecessities::getIngredient)
+                            .collect(Collectors.toList());
+
+                    Map<Integer, Inventory> inventoryMap = inventoryRepository
+                            .findByUserAndIngredientIn(user, neededIngredients)
+                            .stream()
+                            .collect(Collectors.toMap(
+                                    inv -> inv.getIngredient().getIngredientId(),
+                                    inv -> inv));
+
+                    List<RecipeIngredientStatusDTO> ingredientStatuses = new ArrayList<>();
+                    int matchedCount = 0;
+
+                    for (RecipeNecessities requirement : requirements) {
+                        Ingredient ingredient = requirement.getIngredient();
+                        int requiredQuantity = requirement.getQuantity();
+                        int availableQuantity = inventoryMap.containsKey(ingredient.getIngredientId())
+                                ? inventoryMap.get(ingredient.getIngredientId()).getQuantity()
+                                : 0;
+                        int missingQuantity = Math.max(0, requiredQuantity - availableQuantity);
+                        if (missingQuantity == 0) {
+                            matchedCount += 1;
+                        }
+
+                        ingredientStatuses.add(new RecipeIngredientStatusDTO(
+                                ingredient.getIngredientId(),
+                                ingredient.getName(),
+                                ingredient.getMeasurementUnit(),
+                                requiredQuantity,
+                                availableQuantity,
+                                missingQuantity));
+                    }
+
+                    int totalCount = requirements.size();
+                    double matchPercentage = totalCount == 0
+                            ? 100.0
+                            : Math.round((double) matchedCount / totalCount * 100.0 * 100.0) / 100.0;
+
+                    return new RecipeMatchDetailsDTO(recipe, matchedCount, totalCount, matchPercentage, ingredientStatuses);
+                })
+                .sorted(Comparator.comparingDouble(RecipeMatchDetailsDTO::getMatchPercentage).reversed())
+                .collect(Collectors.toList());
     }
 }

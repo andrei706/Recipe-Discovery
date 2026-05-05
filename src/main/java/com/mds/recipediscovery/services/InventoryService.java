@@ -1,5 +1,6 @@
 package com.mds.recipediscovery.services;
 
+import com.mds.recipediscovery.dto.InventoryItemDTO;
 import com.mds.recipediscovery.models.Ingredient;
 import com.mds.recipediscovery.models.Inventory;
 import com.mds.recipediscovery.models.User;
@@ -8,6 +9,7 @@ import com.mds.recipediscovery.repository.InventoryRepository;
 import com.mds.recipediscovery.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -82,5 +84,18 @@ public class InventoryService {
                 .orElseThrow(() -> new RuntimeException("Ingredient not found in user's inventory"));
 
         inventoryRepository.delete(inventory);
+    }
+
+    public List<InventoryItemDTO> getInventoryForUser(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return inventoryRepository.findByUser(user).stream()
+                .map(item -> new InventoryItemDTO(
+                        item.getIngredient().getIngredientId(),
+                        item.getIngredient().getName(),
+                        item.getIngredient().getMeasurementUnit(),
+                        item.getQuantity()))
+                .toList();
     }
 }

@@ -29,7 +29,7 @@ public class Recipe {
     @Column(name = "carbohydrates_g", nullable = false)
     private float carbohydratesG;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "recipe_diet_classifications",
             joinColumns = @JoinColumn(name = "recipe_id"),
@@ -43,6 +43,16 @@ public class Recipe {
     public void setRecipeId(Integer recipeId) { this.recipeId = recipeId; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+    public int getTotalPrepTimeMinutes() { return totalPrepTimeMinutes; }
+    public void setTotalPrepTimeMinutes(int totalPrepTimeMinutes) { this.totalPrepTimeMinutes = totalPrepTimeMinutes; }
     public float getCaloriesKcal() { return caloriesKcal; }
     public void setCaloriesKcal(float caloriesKcal) { this.caloriesKcal = caloriesKcal; }
+    public float getFatsG() { return fatsG; }
+    public void setFatsG(float fatsG) { this.fatsG = fatsG; }
+    public float getProteinsG() { return proteinsG; }
+    public void setProteinsG(float proteinsG) { this.proteinsG = proteinsG; }
+    public float getCarbohydratesG() { return carbohydratesG; }
+    public void setCarbohydratesG(float carbohydratesG) { this.carbohydratesG = carbohydratesG; }
+    public Set<Diet> getDietClassifications() { return dietClassifications; }
+    public void setDietClassifications(Set<Diet> dietClassifications) { this.dietClassifications = dietClassifications; }
 }
