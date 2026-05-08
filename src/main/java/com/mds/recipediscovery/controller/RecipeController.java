@@ -44,6 +44,11 @@ public class RecipeController {
         return ResponseEntity.ok(recipeService.getRecipeDetailsWithInventory(getCurrentUserId(authentication)));
     }
 
+    @GetMapping("/{recipeId}")
+    public ResponseEntity<RecipeMatchDetailsDTO> getRecipeById(@PathVariable Integer recipeId, Authentication authentication) {
+        return ResponseEntity.ok(recipeService.getRecipeDetailById(getCurrentUserId(authentication), recipeId));
+    }
+
     @PostMapping("/{recipeId}/cook")
     public ResponseEntity<String> cookRecipe(@PathVariable Integer recipeId, Authentication authentication) {
         try {

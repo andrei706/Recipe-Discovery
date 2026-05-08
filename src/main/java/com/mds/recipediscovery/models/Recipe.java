@@ -17,6 +17,9 @@ public class Recipe {
     @Column(name = "total_prep_time_minutes")
     private int totalPrepTimeMinutes;
 
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
     @Column(name = "calories_kcal", nullable = false)
     private float caloriesKcal;
 
@@ -55,4 +58,6 @@ public class Recipe {
     public void setCarbohydratesG(float carbohydratesG) { this.carbohydratesG = carbohydratesG; }
     public Set<Diet> getDietClassifications() { return dietClassifications; }
     public void setDietClassifications(Set<Diet> dietClassifications) { this.dietClassifications = dietClassifications; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 }

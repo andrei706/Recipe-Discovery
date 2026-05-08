@@ -102,6 +102,60 @@ public class RecipeService {
         }
     }
 
+    public RecipeMatchDetailsDTO getRecipeDetailById(Integer userId, Integer recipeId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Recipe recipe = recipeRepository.findById(recipeId)
+                .orElseThrow(() -> new RuntimeException("Recipe not found"));
+
+        List<RecipeNecessities> requirements = recipeIngredientRepository.findByRecipe(recipe);
+        if (requirements.isEmpty()) {
+            return new RecipeMatchDetailsDTO(recipe, 0, 0, 100.0, List.of());
+        }
+
+        List<Ingredient> neededIngredients = requirements.stream()
+                .map(RecipeNecessities::getIngredient)
+                .collect(Collectors.toList());
+
+        Map<Integer, Inventory> inventoryMap = inventoryRepository
+                .findByUserAndIngredientIn(user, neededIngredients)
+                .stream()
+                .collect(Collectors.toMap(
+                        inv -> inv.getIngredient().getIngredientId(),
+                        inv -> inv));
+
+        List<RecipeIngredientStatusDTO> ingredientStatuses = new ArrayList<>();
+        int matchedCount = 0;
+
+        for (RecipeNecessities requirement : requirements) {
+            Ingredient ingredient = requirement.getIngredient();
+            int requiredQuantity = requirement.getQuantity();
+            int availableQuantity = inventoryMap.containsKey(ingredient.getIngredientId())
+                    ? inventoryMap.get(ingredient.getIngredientId()).getQuantity()
+                    : 0;
+            int missingQuantity = Math.max(0, requiredQuantity - availableQuantity);
+            if (missingQuantity == 0) {
+                matchedCount += 1;
+            }
+
+            ingredientStatuses.add(new RecipeIngredientStatusDTO(
+                    ingredient.getIngredientId(),
+                    ingredient.getName(),
+                    ingredient.getMeasurementUnit(),
+                    requiredQuantity,
+                    availableQuantity,
+                    missingQuantity));
+        }
+
+        int totalCount = requirements.size();
+        double matchPercentage = totalCount == 0
+                ? 100.0
+                : Math.round((double) matchedCount / totalCount * 100.0 * 100.0) / 100.0;
+
+        return new RecipeMatchDetailsDTO(recipe, matchedCount, totalCount, matchPercentage, ingredientStatuses);
+    }
+
     public List<RecipeMatchDetailsDTO> getRecipeDetailsWithInventory(Integer userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));

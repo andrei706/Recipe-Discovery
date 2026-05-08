@@ -22,3 +22,7 @@ export function cookRecipe(token, recipeId) {
 export function getRecipeDetails(token) {
   return apiRequest("/api/recipes/details", { token });
 }
+
+export function getRecipeById(token, recipeId) {
+  return apiRequest(`/api/recipes/${recipeId}`, { token });
+}

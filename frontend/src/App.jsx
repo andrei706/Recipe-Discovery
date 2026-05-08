@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import TopBar from "./components/TopBar.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import RecipesPage from "./pages/RecipesPage.jsx";
+import RecipePage from "./pages/RecipePage.jsx";
 import InventoryPage from "./pages/InventoryPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
@@ -15,6 +16,7 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<RecipesPage />} />
+            <Route path="/recipe/:recipeId" element={<RecipePage />} />
             <Route path="/inventory" element={<InventoryPage />} />
             <Route path="/profile" element={<ProfilePage />} />
           </Route>

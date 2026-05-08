@@ -1,17 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import DietFilter from "../components/DietFilter.jsx";
 import RecipeCard from "../components/RecipeCard.jsx";
-import { cookRecipe, getAvailableRecipes, getMatchRecipes, getRecipeDetails, getSortedRecipes } from "../api/recipes.js";
+import { getAvailableRecipes, getMatchRecipes, getRecipeDetails } from "../api/recipes.js";
 import { useAuth } from "../context/AuthContext.jsx";
 
 const VIEW_OPTIONS = [
   { id: "available", label: "Available" },
-  { id: "sorted", label: "Best match" },
   { id: "match", label: "Match %" }
 ];
 
 export default function RecipesPage() {
   const { token } = useAuth();
+  const navigate = useNavigate();
   const [view, setView] = useState("available");
   const [dietFilter, setDietFilter] = useState("");
   const [recipes, setRecipes] = useState([]);
@@ -26,8 +27,6 @@ export default function RecipesPage() {
       let response = [];
       if (view === "available") {
         response = await getAvailableRecipes(token);
-      } else if (view === "sorted") {
-        response = await getSortedRecipes(token);
       } else {
         response = await getMatchRecipes(token);
       }
@@ -83,17 +82,8 @@ export default function RecipesPage() {
     });
   }, [dietFilter, normalizedRecipes]);
 
-  const handleCook = async (recipeId) => {
-    setStatus({ type: "", message: "" });
-    try {
-      await cookRecipe(token, recipeId);
-      setStatus({ type: "success", message: "Recipe cooked successfully." });
-      if (view === "available") {
-        loadRecipes();
-      }
-    } catch (error) {
-      setStatus({ type: "error", message: error.message });
-    }
+  const handleCook = (recipeId) => {
+    navigate(`/recipe/${recipeId}`);
   };
 
   return (
@@ -135,11 +125,6 @@ export default function RecipesPage() {
 
       <div className="grid" style={{ gap: 16 }}>
         <DietFilter value={dietFilter} onChange={setDietFilter} />
-        <div className="card">
-          <h3>Tips</h3>
-          <p>Diet filter requires recipe diets in API payload.</p>
-          <p>Match % view shows how many ingredients you already have.</p>
-        </div>
       </div>
     </div>
   );

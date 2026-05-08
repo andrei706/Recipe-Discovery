@@ -58,8 +58,8 @@ export default function RecipeCard({ recipe, match, details, onCook }) {
           </div>
         ) : null}
 
-        <button type="button" className="secondary-btn" onClick={onCook}>
-          Cook recipe
+        <button type="button" className="green-btn" onClick={onCook}>
+          View recipe
         </button>
       </div>
     </div>
