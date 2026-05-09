@@ -68,6 +68,23 @@ a {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
 }
 
+.auth-card {
+  max-width: 420px;
+  margin: 40px auto;
+}
+
+.auth-switch {
+  color: #6b7280;
+  font-size: 14px;
+  margin: 16px 0 0;
+  text-align: center;
+}
+
+.auth-switch a {
+  color: #c2410c;
+  font-weight: 700;
+}
+
 .grid {
   display: grid;
   gap: 16px;

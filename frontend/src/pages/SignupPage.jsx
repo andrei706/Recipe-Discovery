@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import { login } from "../api/auth.js";
+import { signup } from "../api/auth.js";
 import { useAuth } from "../context/AuthContext.jsx";
 
-export default function LoginPage() {
+export default function SignupPage() {
   const navigate = useNavigate();
   const { saveAuth, token } = useAuth();
-  const [loginType, setLoginType] = useState("USERNAME");
-  const [identifier, setIdentifier] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -19,9 +20,15 @@ export default function LoginPage() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
     setLoading(true);
     try {
-      const response = await login({ loginType, identifier, password });
+      const response = await signup({ username, email, password });
       saveAuth({
         token: response.token,
         tokenType: response.tokenType,
@@ -42,18 +49,23 @@ export default function LoginPage() {
 
   return (
     <div className="card auth-card">
-      <h2>Login</h2>
+      <h2>Sign up</h2>
       {error ? <div className="alert">{error}</div> : null}
       <form className="form-row" onSubmit={handleSubmit}>
-        <select value={loginType} onChange={(event) => setLoginType(event.target.value)}>
-          <option value="USERNAME">Username</option>
-          <option value="EMAIL">Email</option>
-        </select>
         <input
           type="text"
-          placeholder={loginType === "USERNAME" ? "Username" : "Email"}
-          value={identifier}
-          onChange={(event) => setIdentifier(event.target.value)}
+          placeholder="Username"
+          value={username}
+          onChange={(event) => setUsername(event.target.value)}
+          maxLength={50}
+          required
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          maxLength={100}
           required
         />
         <input
@@ -61,14 +73,23 @@ export default function LoginPage() {
           placeholder="Password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
+          minLength={8}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Confirm password"
+          value={confirmPassword}
+          onChange={(event) => setConfirmPassword(event.target.value)}
+          minLength={8}
           required
         />
         <button className="primary-btn" type="submit" disabled={loading}>
-          {loading ? "Signing in..." : "Sign in"}
+          {loading ? "Creating account..." : "Create account"}
         </button>
       </form>
       <p className="auth-switch">
-        Don't have an account? <Link to="/signup">Sign up</Link>
+        Already have an account? <Link to="/login">Sign in</Link>
       </p>
     </div>
   );

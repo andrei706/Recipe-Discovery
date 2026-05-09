@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import TopBar from "./components/TopBar.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
+import SignupPage from "./pages/SignupPage.jsx";
 import RecipesPage from "./pages/RecipesPage.jsx";
 import RecipePage from "./pages/RecipePage.jsx";
 import InventoryPage from "./pages/InventoryPage.jsx";
@@ -14,6 +15,7 @@ export default function App() {
       <div className="app-content">
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<RecipesPage />} />
             <Route path="/recipe/:recipeId" element={<RecipePage />} />

@@ -3,6 +3,8 @@ package com.mds.recipediscovery.services;
 import com.mds.recipediscovery.dto.ChangePasswordRequestDTO;
 import com.mds.recipediscovery.dto.LoginRequestDTO;
 import com.mds.recipediscovery.dto.LoginResponseDTO;
+import com.mds.recipediscovery.dto.SignupRequestDTO;
+import com.mds.recipediscovery.dto.SignupResponseDTO;
 import com.mds.recipediscovery.models.User;
 import com.mds.recipediscovery.repository.UserRepository;
 import com.mds.recipediscovery.security.JwtService;
@@ -103,6 +105,45 @@ class UserServiceTest {
         when(userRepository.findByEmail("elena@email.com")).thenReturn(Optional.of(user));
 
         assertThrows(SecurityException.class, () -> userService.login(request));
+    }
+
+    @Test
+    void signupWithValidData_CreatesUserAndReturnsToken() {
+        SignupRequestDTO request = new SignupRequestDTO();
+        request.setUsername("Maria");
+        request.setEmail("maria@email.com");
+        request.setPassword("mariaPass123");
+
+        when(userRepository.findByUsername("Maria")).thenReturn(Optional.empty());
+        when(userRepository.findByEmail("maria@email.com")).thenReturn(Optional.empty());
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+            User user = invocation.getArgument(0);
+            user.setUserId(10);
+            return user;
+        });
+
+        SignupResponseDTO response = userService.signup(request);
+
+        assertTrue(response.getToken() != null && !response.getToken().isBlank());
+        assertEquals("Bearer", response.getTokenType());
+        assertEquals(10, response.getUserId());
+        assertEquals("Maria", response.getUsername());
+        assertEquals("maria@email.com", response.getEmail());
+        verify(userRepository).save(any(User.class));
+    }
+
+    @Test
+    void signupWithExistingUsername_ThrowsIllegalArgumentException() {
+        SignupRequestDTO request = new SignupRequestDTO();
+        request.setUsername("Andrei");
+        request.setEmail("new@email.com");
+        request.setPassword("andreiPass123");
+
+        User existingUser = new User();
+        when(userRepository.findByUsername("Andrei")).thenReturn(Optional.of(existingUser));
+
+        assertThrows(IllegalArgumentException.class, () -> userService.signup(request));
+        verify(userRepository, never()).save(any(User.class));
     }
 
     @Test

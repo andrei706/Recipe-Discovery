@@ -4,6 +4,8 @@ import com.mds.recipediscovery.dto.ChangePasswordRequestDTO;
 import com.mds.recipediscovery.dto.LoginRequestDTO;
 import com.mds.recipediscovery.dto.LoginResponseDTO;
 import com.mds.recipediscovery.dto.LogoutResponseDTO;
+import com.mds.recipediscovery.dto.SignupRequestDTO;
+import com.mds.recipediscovery.dto.SignupResponseDTO;
 import com.mds.recipediscovery.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +36,15 @@ public class AuthController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (SecurityException ex) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        }
+    }
+
+    @PostMapping("/signup")
+    public ResponseEntity<SignupResponseDTO> signup(@RequestBody SignupRequestDTO request) {
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED).body(userService.signup(request));
+        } catch (IllegalArgumentException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
     }
 

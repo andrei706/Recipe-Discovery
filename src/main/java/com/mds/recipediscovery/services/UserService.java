@@ -3,6 +3,8 @@ package com.mds.recipediscovery.services;
 import com.mds.recipediscovery.dto.ChangePasswordRequestDTO;
 import com.mds.recipediscovery.dto.LoginRequestDTO;
 import com.mds.recipediscovery.dto.LoginResponseDTO;
+import com.mds.recipediscovery.dto.SignupRequestDTO;
+import com.mds.recipediscovery.dto.SignupResponseDTO;
 import com.mds.recipediscovery.models.User;
 import com.mds.recipediscovery.repository.UserRepository;
 import com.mds.recipediscovery.security.JwtService;
@@ -41,6 +43,52 @@ public class UserService {
                 user.getUserId(),
                 user.getUsername(),
                 user.getEmail()
+        );
+    }
+
+    public SignupResponseDTO signup(SignupRequestDTO request) {
+        if (request == null || isBlank(request.getUsername()) || isBlank(request.getEmail()) || isBlank(request.getPassword())) {
+            throw new IllegalArgumentException("username, email si password sunt obligatorii");
+        }
+
+        String username = request.getUsername().trim();
+        String email = request.getEmail().trim();
+
+        if (username.length() > 50) {
+            throw new IllegalArgumentException("Username-ul trebuie sa aiba maxim 50 de caractere");
+        }
+
+        if (email.length() > 100 || !email.contains("@")) {
+            throw new IllegalArgumentException("Email invalid");
+        }
+
+        if (request.getPassword().length() < 8) {
+            throw new IllegalArgumentException("Parola trebuie sa aiba minim 8 caractere");
+        }
+
+        if (userRepository.findByUsername(username).isPresent()) {
+            throw new IllegalArgumentException("Username deja folosit");
+        }
+
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new IllegalArgumentException("Email deja folosit");
+        }
+
+        User user = new User();
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        User savedUser = userRepository.save(user);
+        String token = jwtService.generateToken(savedUser);
+
+        return new SignupResponseDTO(
+                token,
+                "Bearer",
+                jwtService.getJwtExpirationMs(),
+                savedUser.getUserId(),
+                savedUser.getUsername(),
+                savedUser.getEmail()
         );
     }
 
