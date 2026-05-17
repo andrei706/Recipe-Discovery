@@ -22,9 +22,9 @@ public class RecipeService {
     private final RecipeNecessitiesRepository recipeIngredientRepository;
 
     public RecipeService(RecipeRepository recipeRepository,
-            UserRepository userRepository,
-            InventoryRepository inventoryRepository,
-            RecipeNecessitiesRepository recipeIngredientRepository) {
+                         UserRepository userRepository,
+                         InventoryRepository inventoryRepository,
+                         RecipeNecessitiesRepository recipeIngredientRepository) {
         this.recipeRepository = recipeRepository;
         this.userRepository = userRepository;
         this.inventoryRepository = inventoryRepository;
@@ -85,7 +85,7 @@ public class RecipeService {
             Inventory inventory = userInventoryMap.get(req.getIngredient().getIngredientId());
             if (inventory == null || inventory.getQuantity() < req.getQuantity()) {
                 throw new RuntimeException(
-                        "Nu ai suficiente ingrediente pentru a găti această rețetă: " + recipe.getName());
+                        "You do not have enough ingredients to cook this recipe: " + recipe.getName());
             }
         }
 

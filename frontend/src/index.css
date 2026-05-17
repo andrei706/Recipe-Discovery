@@ -100,7 +100,8 @@ a {
 }
 
 .form-row input,
-.form-row select {
+.form-row select,
+.search-input {
   padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid #d1d5db;
@@ -146,6 +147,7 @@ a {
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 16px;
+  flex-wrap: wrap;
 }
 
 .badge {
@@ -192,6 +194,13 @@ a {
 .inventory-card {
   display: grid;
   gap: 12px;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+
+.inventory-card.focused {
+  border-color: #f28c28;
+  box-shadow: 0 0 0 3px rgba(242, 140, 40, 0.15);
 }
 
 .inventory-title {
@@ -245,4 +254,17 @@ a {
 .recipe-ingredients-empty {
   color: #6b7280;
   font-size: 13px;
+}
+
+.recipe-details-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 850px) {
+  .recipe-details-layout {
+    grid-template-columns: 1fr;
+  }
 }

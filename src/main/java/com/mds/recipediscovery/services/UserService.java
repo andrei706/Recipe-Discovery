@@ -26,13 +26,13 @@ public class UserService {
 
     public LoginResponseDTO login(LoginRequestDTO request) {
         if (request == null || isBlank(request.getIdentifier()) || isBlank(request.getPassword()) || isBlank(request.getLoginType())) {
-            throw new IllegalArgumentException("loginType, identifier si password sunt obligatorii");
+            throw new IllegalArgumentException("loginType, identifier and password are required");
         }
 
         User user = findUserByLoginType(request.getLoginType(), request.getIdentifier());
 
         if (!matchesPassword(request.getPassword(), user)) {
-            throw new SecurityException("Credentiale invalide");
+            throw new SecurityException("Invalid credentials");
         }
 
         String token = jwtService.generateToken(user);
@@ -48,30 +48,30 @@ public class UserService {
 
     public SignupResponseDTO signup(SignupRequestDTO request) {
         if (request == null || isBlank(request.getUsername()) || isBlank(request.getEmail()) || isBlank(request.getPassword())) {
-            throw new IllegalArgumentException("username, email si password sunt obligatorii");
+            throw new IllegalArgumentException("username, email and password are required");
         }
 
         String username = request.getUsername().trim();
         String email = request.getEmail().trim();
 
         if (username.length() > 50) {
-            throw new IllegalArgumentException("Username-ul trebuie sa aiba maxim 50 de caractere");
+            throw new IllegalArgumentException("Username must be at most 50 characters long");
         }
 
         if (email.length() > 100 || !email.contains("@")) {
-            throw new IllegalArgumentException("Email invalid");
+            throw new IllegalArgumentException("Invalid email");
         }
 
         if (request.getPassword().length() < 8) {
-            throw new IllegalArgumentException("Parola trebuie sa aiba minim 8 caractere");
+            throw new IllegalArgumentException("Password must be at least 8 characters long");
         }
 
         if (userRepository.findByUsername(username).isPresent()) {
-            throw new IllegalArgumentException("Username deja folosit");
+            throw new IllegalArgumentException("Username already in use");
         }
 
         if (userRepository.findByEmail(email).isPresent()) {
-            throw new IllegalArgumentException("Email deja folosit");
+            throw new IllegalArgumentException("Email already in use");
         }
 
         User user = new User();
@@ -99,17 +99,17 @@ public class UserService {
 
     public void changePassword(Integer userId, ChangePasswordRequestDTO request) {
         if (request == null || isBlank(request.getCurrentPassword()) || isBlank(request.getNewPassword())) {
-            throw new IllegalArgumentException("currentPassword si newPassword sunt obligatorii");
+            throw new IllegalArgumentException("currentPassword and newPassword are required");
         }
 
         if (request.getNewPassword().length() < 8) {
-            throw new IllegalArgumentException("Parola noua trebuie sa aiba minim 8 caractere");
+            throw new IllegalArgumentException("New password must be at least 8 characters long");
         }
 
         User user = getUserById(userId);
 
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
-            throw new SecurityException("Parola curenta este invalida");
+            throw new SecurityException("Current password is invalid");
         }
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
@@ -121,10 +121,10 @@ public class UserService {
 
         return switch (normalizedType) {
             case "USERNAME" -> userRepository.findByUsername(identifier)
-                    .orElseThrow(() -> new SecurityException("Credentiale invalide"));
+                    .orElseThrow(() -> new SecurityException("Invalid credentials"));
             case "EMAIL" -> userRepository.findByEmail(identifier)
-                    .orElseThrow(() -> new SecurityException("Credentiale invalide"));
-            default -> throw new IllegalArgumentException("loginType trebuie sa fie USERNAME sau EMAIL");
+                    .orElseThrow(() -> new SecurityException("Invalid credentials"));
+            default -> throw new IllegalArgumentException("loginType must be USERNAME or EMAIL");
         };
     }
 

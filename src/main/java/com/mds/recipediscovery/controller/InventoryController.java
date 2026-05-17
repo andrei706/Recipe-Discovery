@@ -71,13 +71,13 @@ public class InventoryController {
 
     private Integer getCurrentUserId(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new ResponseStatusException(UNAUTHORIZED, "Utilizator neautentificat");
+            throw new ResponseStatusException(UNAUTHORIZED, "User not authenticated");
         }
 
         try {
             return Integer.valueOf(authentication.getName());
         } catch (NumberFormatException ex) {
-            throw new ResponseStatusException(UNAUTHORIZED, "Token invalid");
+            throw new ResponseStatusException(UNAUTHORIZED, "Invalid token");
         }
     }
 }

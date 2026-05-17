@@ -53,7 +53,7 @@ public class RecipeController {
     public ResponseEntity<String> cookRecipe(@PathVariable Integer recipeId, Authentication authentication) {
         try {
             recipeService.cookRecipe(getCurrentUserId(authentication), recipeId);
-            return ResponseEntity.ok("Recipe cooked successfully!");
+            return ResponseEntity.ok("Recipe has been cooked successfully! Ingredients have been deducted from inventory.");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -61,13 +61,13 @@ public class RecipeController {
 
     private Integer getCurrentUserId(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new ResponseStatusException(UNAUTHORIZED, "Utilizator neautentificat");
+            throw new ResponseStatusException(UNAUTHORIZED, "User not authenticated");
         }
 
         try {
             return Integer.valueOf(authentication.getName());
         } catch (NumberFormatException ex) {
-            throw new ResponseStatusException(UNAUTHORIZED, "Token invalid");
+            throw new ResponseStatusException(UNAUTHORIZED, "Invalid token");
         }
     }
 }

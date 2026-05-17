@@ -50,7 +50,7 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<LogoutResponseDTO> logout() {
-        return ResponseEntity.ok(new LogoutResponseDTO("Logout reusit. Sterge token-ul din client (localStorage/sessionStorage)."));
+        return ResponseEntity.ok(new LogoutResponseDTO("Logout successful. Please clear the token from the client."));
     }
 
     @PostMapping("/change-password")
@@ -58,13 +58,13 @@ public class AuthController {
                                                             @RequestBody ChangePasswordRequestDTO request) {
         try {
             if (authentication == null || authentication.getName() == null) {
-                throw new SecurityException("Utilizator neautentificat");
+                throw new SecurityException("User not authenticated");
             }
             Integer userId = Integer.valueOf(authentication.getName());
             userService.changePassword(userId, request);
-            return ResponseEntity.ok(new LogoutResponseDTO("Parola a fost schimbata cu succes."));
+            return ResponseEntity.ok(new LogoutResponseDTO("Password has been changed successfully."));
         } catch (NumberFormatException ex) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token invalid");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
         } catch (IllegalArgumentException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (SecurityException ex) {

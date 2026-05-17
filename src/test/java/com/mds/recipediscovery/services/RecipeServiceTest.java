@@ -76,10 +76,6 @@ class RecipeServiceTest {
     void testFindAvailableRecipes_ReturnsOnlyCookableRecipes() {
         when(userRepository.findById(1)).thenReturn(Optional.of(testUser));
 
-        Inventory invFlour = new Inventory(testUser, flour, 500);
-        Inventory invEggs = new Inventory(testUser, eggs, 2);
-        when(inventoryRepository.findByUser(testUser)).thenReturn(Arrays.asList(invFlour, invEggs));
-
         when(recipeRepository.findRecipesUserCanCook(1)).thenReturn(List.of(pancake));
 
         List<Recipe> result = recipeService.findAvailableRecipes(1);
@@ -162,7 +158,7 @@ class RecipeServiceTest {
             recipeService.cookRecipe(1, 1);
         });
 
-        assertTrue(exception.getMessage().contains("Nu ai suficiente ingrediente pentru a găti"));
+        assertTrue(exception.getMessage().contains("You do not have enough ingredients to cook this recipe"));
         org.mockito.Mockito.verify(inventoryRepository, org.mockito.Mockito.never())
                 .save(org.mockito.ArgumentMatchers.any());
         org.mockito.Mockito.verify(inventoryRepository, org.mockito.Mockito.never())

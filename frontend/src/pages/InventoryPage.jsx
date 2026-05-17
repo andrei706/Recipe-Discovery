@@ -12,11 +12,26 @@ export default function InventoryPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form, setForm] = useState({ ingredientId: "", quantity: "" });
   const [editValues, setEditValues] = useState({});
+  const [focusedId, setFocusedId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [inventorySearch, setInventorySearch] = useState("");
+
+  const filteredIngredients = useMemo(() => {
+    return ingredients.filter((ing) =>
+      ing.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [ingredients, searchQuery]);
 
   const selectedIngredient = useMemo(() => {
     const id = Number(form.ingredientId);
     return ingredients.find((item) => item.ingredientId === id);
   }, [ingredients, form.ingredientId]);
+
+  const filteredInventory = useMemo(() => {
+    return inventory.filter((item) =>
+      item.ingredientName.toLowerCase().includes(inventorySearch.toLowerCase())
+    );
+  }, [inventory, inventorySearch]);
 
   const loadIngredients = async () => {
     try {
@@ -54,6 +69,16 @@ export default function InventoryPage() {
     loadIngredients();
     loadInventory();
   }, [token]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(".inventory-card") && !event.target.closest(".primary-btn")) {
+        setFocusedId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleAddSubmit = async (event) => {
     event.preventDefault();
@@ -99,6 +124,9 @@ export default function InventoryPage() {
   };
 
   const handleRemove = async (ingredientId) => {
+    const confirmRemove = window.confirm("Are you sure you want to remove this ingredient from your inventory?");
+    if (!confirmRemove) return;
+
     setStatus({ type: "", message: "" });
     try {
       await removeIngredient(token, { ingredientId });
@@ -113,9 +141,26 @@ export default function InventoryPage() {
     <div className="grid" style={{ gap: 20 }}>
       <div className="section-header">
         <h2>Inventory</h2>
-        <button type="button" className="primary-btn" onClick={() => setIsModalOpen(true)}>
-          + Add
-        </button>
+        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Search in inventory..."
+            value={inventorySearch}
+            onChange={(e) => setInventorySearch(e.target.value)}
+            style={{ width: "250px" }}
+          />
+          <button
+            type="button"
+            className="primary-btn"
+            onClick={() => {
+              setIsModalOpen(true);
+              setSearchQuery("");
+            }}
+          >
+            + Add
+          </button>
+        </div>
       </div>
 
       {status.message ? (
@@ -129,8 +174,12 @@ export default function InventoryPage() {
       ) : null}
 
       <div className="grid inventory-grid">
-        {inventory.map((item) => (
-          <div className="card inventory-card" key={item.ingredientId}>
+        {filteredInventory.map((item) => (
+          <div
+            className={`card inventory-card ${focusedId === item.ingredientId ? "focused" : ""}`}
+            key={item.ingredientId}
+            onClick={() => setFocusedId(item.ingredientId)}
+          >
             <div className="inventory-title">{item.ingredientName}</div>
             <div className="badge">Unit: {item.measurementUnit}</div>
             <div className="form-row">
@@ -139,6 +188,7 @@ export default function InventoryPage() {
                 min="0"
                 step="1"
                 value={editValues[item.ingredientId] ?? ""}
+                onFocus={() => setFocusedId(item.ingredientId)}
                 onChange={(event) =>
                   setEditValues((prev) => ({
                     ...prev,
@@ -146,39 +196,64 @@ export default function InventoryPage() {
                   }))
                 }
               />
-              <div className="inventory-actions">
-                <button
-                  type="button"
-                  className="secondary-btn"
-                  onClick={() => handleUpdate(item.ingredientId)}
-                >
-                  Save
-                </button>
-                <button
-                  type="button"
-                  className="danger-btn"
-                  onClick={() => handleRemove(item.ingredientId)}
-                >
-                  Remove
-                </button>
-              </div>
+              {focusedId === item.ingredientId && (
+                <div className="inventory-actions">
+                  <button
+                    type="button"
+                    className="secondary-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleUpdate(item.ingredientId);
+                    }}
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    className="danger-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemove(item.ingredientId);
+                    }}
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         ))}
       </div>
 
       {isModalOpen ? (
-        <div className="modal-backdrop" onClick={() => setIsModalOpen(false)}>
+        <div
+          className="modal-backdrop"
+          onClick={() => {
+            setIsModalOpen(false);
+            setSearchQuery("");
+          }}
+        >
           <div className="modal" onClick={(event) => event.stopPropagation()}>
             <h3>Add ingredient</h3>
             <form className="form-row" onSubmit={handleAddSubmit}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <label style={{ fontSize: "12px", fontWeight: "600", color: "#6b7280" }}>Search:</label>
+                <input
+                  type="text"
+                  className="search-input"
+                  placeholder="Type to filter..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  autoFocus
+                />
+              </div>
               <select
                 value={form.ingredientId}
                 onChange={(event) => setForm((prev) => ({ ...prev, ingredientId: event.target.value }))}
                 required
               >
                 <option value="">Select ingredient</option>
-                {ingredients.map((ingredient) => (
+                {filteredIngredients.map((ingredient) => (
                   <option key={ingredient.ingredientId} value={ingredient.ingredientId}>
                     {ingredient.name}
                   </option>

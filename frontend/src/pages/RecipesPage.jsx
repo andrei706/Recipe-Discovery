@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import DietFilter from "../components/DietFilter.jsx";
 import RecipeCard from "../components/RecipeCard.jsx";
 import { getAvailableRecipes, getMatchRecipes, getRecipeDetails } from "../api/recipes.js";
@@ -13,12 +13,21 @@ const VIEW_OPTIONS = [
 export default function RecipesPage() {
   const { token } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [view, setView] = useState("available");
   const [dietFilter, setDietFilter] = useState("");
   const [recipes, setRecipes] = useState([]);
   const [detailsMap, setDetailsMap] = useState({});
   const [status, setStatus] = useState({ type: "", message: "" });
   const [loading, setLoading] = useState(false);
+  const [recipeSearch, setRecipeSearch] = useState("");
+
+  useEffect(() => {
+    if (location.state?.status) {
+      setStatus(location.state.status);
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const loadRecipes = async () => {
     setLoading(true);
@@ -73,14 +82,20 @@ export default function RecipesPage() {
   }, [recipes]);
 
   const filtered = useMemo(() => {
-    if (!dietFilter) {
-      return normalizedRecipes;
+    let result = normalizedRecipes;
+    if (dietFilter) {
+      result = result.filter(({ recipe }) => {
+        const diets = recipe?.dietClassifications || [];
+        return diets.some((diet) => diet.name?.toLowerCase() === dietFilter.toLowerCase());
+      });
     }
-    return normalizedRecipes.filter(({ recipe }) => {
-      const diets = recipe?.dietClassifications || [];
-      return diets.some((diet) => diet.name?.toLowerCase() === dietFilter.toLowerCase());
-    });
-  }, [dietFilter, normalizedRecipes]);
+    if (recipeSearch) {
+      result = result.filter(({ recipe }) =>
+        recipe.name.toLowerCase().includes(recipeSearch.toLowerCase())
+      );
+    }
+    return result;
+  }, [dietFilter, recipeSearch, normalizedRecipes]);
 
   const handleCook = (recipeId) => {
     navigate(`/recipe/${recipeId}`);
@@ -91,7 +106,7 @@ export default function RecipesPage() {
       <div className="grid" style={{ gap: 16 }}>
         <div className="section-header">
           <h2>Recipes</h2>
-          <div className="form-row" style={{ gridAutoFlow: "column" }}>
+          <div className="form-row" style={{ gridAutoFlow: "column", gap: 8 }}>
             {VIEW_OPTIONS.map((option) => (
               <button
                 key={option.id}
@@ -102,6 +117,19 @@ export default function RecipesPage() {
                 {option.label}
               </button>
             ))}
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="form-row">
+            <label style={{ fontWeight: 600 }}>Search Recipes:</label>
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search by name..."
+              value={recipeSearch}
+              onChange={(e) => setRecipeSearch(e.target.value)}
+            />
           </div>
         </div>
 
