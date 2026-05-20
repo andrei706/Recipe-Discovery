@@ -34,4 +34,11 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
            "LEFT JOIN Inventory i ON i.ingredient = rn.ingredient AND i.user.userId = :userId AND i.quantity >= rn.quantity " +
            "GROUP BY r")
     List<Object[]> findRecipesWithMatchData(@Param("userId") Integer userId);
+
+    @Query("SELECT DISTINCT r FROM Recipe r " +
+           "LEFT JOIN RecipeNecessities rn ON rn.recipe = r " +
+           "WHERE LOWER(r.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+           "OR LOWER(r.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+           "OR LOWER(rn.ingredient.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+    List<Recipe> searchRecipesByTerm(@Param("searchTerm") String searchTerm);
 }

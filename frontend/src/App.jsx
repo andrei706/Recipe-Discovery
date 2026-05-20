@@ -6,6 +6,7 @@ import RecipesPage from "./pages/RecipesPage.jsx";
 import RecipePage from "./pages/RecipePage.jsx";
 import InventoryPage from "./pages/InventoryPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
+import AIChefPage from "./pages/AIChefPage.jsx";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 
 export default function App() {
@@ -21,6 +22,7 @@ export default function App() {
             <Route path="/recipe/:recipeId" element={<RecipePage />} />
             <Route path="/inventory" element={<InventoryPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/ai-chef" element={<AIChefPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -29,6 +29,7 @@ export default function TopBar() {
           <>
             <NavLink to="/">Recipes</NavLink>
             <NavLink to="/inventory">Inventory</NavLink>
+            <NavLink to="/ai-chef">AI Chef</NavLink>
             <NavLink to="/profile">Profile</NavLink>
             <span>{user?.username || "User"}</span>
             <button type="button" onClick={handleLogout}>
