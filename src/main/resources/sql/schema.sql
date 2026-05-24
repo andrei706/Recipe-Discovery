@@ -1,6 +1,8 @@
 DROP TABLE IF EXISTS user_dietary_preferences;
 DROP TABLE IF EXISTS recipe_diet_classifications;
 DROP TABLE IF EXISTS inventory;
+DROP TABLE IF EXISTS plan_details;
+DROP TABLE IF EXISTS plans;
 DROP TABLE IF EXISTS recipe_ingredients;
 DROP TABLE IF EXISTS recipes;
 DROP TABLE IF EXISTS diets;
@@ -40,6 +42,7 @@ CREATE TABLE recipes (
                          sugars_g DECIMAL(6, 2) DEFAULT 0 NOT NULL,
                          proteins_g DECIMAL(6, 2) NOT NULL,
                          salt_g DECIMAL(6, 2) DEFAULT 0 NOT NULL,
+                         features JSON NULL,
                          CONSTRAINT ck_recipe_time CHECK (total_prep_time_minutes > 0),
                          CONSTRAINT ck_recipe_calories CHECK (calories_kcal >= 0),
                          CONSTRAINT ck_recipe_fats CHECK (fats_g >= 0),
@@ -47,7 +50,8 @@ CREATE TABLE recipes (
                          CONSTRAINT ck_recipe_carbs CHECK (carbohydrates_g >= 0),
                          CONSTRAINT ck_recipe_sugars CHECK (sugars_g >= 0),
                          CONSTRAINT ck_recipe_proteins CHECK (proteins_g >= 0),
-                         CONSTRAINT ck_recipe_salt CHECK (salt_g >= 0)
+                         CONSTRAINT ck_recipe_salt CHECK (salt_g >= 0),
+                         CONSTRAINT ck_features_json_valid CHECK (features IS NULL OR JSON_VALID(features))
 ) ENGINE=InnoDB;
 
 CREATE TABLE recipe_ingredients (
@@ -84,6 +88,33 @@ CREATE TABLE user_dietary_preferences (
                                           PRIMARY KEY (user_id, diet_id),
                                           CONSTRAINT fk_pref_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
                                           CONSTRAINT fk_pref_diet FOREIGN KEY (diet_id) REFERENCES diets(diet_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE plans (
+    plan_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT fk_plan_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    CONSTRAINT ck_plan_dates CHECK (start_date <= end_date)
+) ENGINE=InnoDB;
+
+CREATE TABLE plan_details (
+    plan_detail_id INT AUTO_INCREMENT PRIMARY KEY,
+    plan_id INT NOT NULL,
+    recipe_id INT NOT NULL,
+    meal_type VARCHAR(20) NOT NULL,
+    day_number INT NOT NULL,
+    is_followed BOOLEAN NOT NULL DEFAULT FALSE,
+    quantity INT NOT NULL,
+    CONSTRAINT fk_plan_details_plan FOREIGN KEY (plan_id) REFERENCES plans(plan_id) ON DELETE CASCADE,
+    CONSTRAINT fk_plan_details_recipe FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id) ON DELETE RESTRICT,
+    CONSTRAINT ck_plan_day CHECK (day_number BETWEEN 1 AND 31),
+    CONSTRAINT ck_plan_meal_type CHECK (meal_type IN ('breakfast', 'lunch', 'dinner', 'snack')),
+    CONSTRAINT ck_plan_quantity CHECK (quantity > 0 && quantity <= 15),
+    CONSTRAINT uq_plan_day_meal UNIQUE (plan_id, day_number, meal_type)
 ) ENGINE=InnoDB;
 
 INSERT INTO users (username, email, password) VALUES

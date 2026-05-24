@@ -3,6 +3,9 @@ package com.mds.recipediscovery.models;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.Set;
+import java.util.List;
+import com.mds.recipediscovery.models.converters.StringListConverter;
+import jakarta.persistence.Convert;
 
 @Entity
 @Table(name = "recipes")
@@ -40,6 +43,10 @@ public class Recipe {
     )
     private Set<Diet> dietClassifications;
 
+    @Column(columnDefinition = "json")
+    @Convert(converter = StringListConverter.class)
+    private List<String> features;
+
     public Recipe() {}
 
     public Integer getRecipeId() { return recipeId; }
@@ -60,4 +67,6 @@ public class Recipe {
     public void setDietClassifications(Set<Diet> dietClassifications) { this.dietClassifications = dietClassifications; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+    public List<String> getFeatures() { return features; }
+    public void setFeatures(List<String> features) { this.features = features; }
 }
