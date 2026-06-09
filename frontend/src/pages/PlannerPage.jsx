@@ -11,6 +11,7 @@ import {
   addPlanDetail,
   updatePlanDetail,
   deletePlanDetail,
+  generateAiPlan,
 } from "../api/plans.js";
 import { useNavigate } from "react-router-dom";
 
@@ -62,6 +63,9 @@ export default function PlannerPage() {
   const [editingPlan, setEditingPlan] = useState(null);
   const [planForm, setPlanForm] = useState({ name: "", startDate: today(), endDate: addDays(today(), 6) });
   const [planDayError, setPlanDayError] = useState("");
+  const [modalStep, setModalStep] = useState(1); // 1 = dates, 2 = AI prompt
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiGenerating, setAiGenerating] = useState(false);
 
   // Add-slot modal
   const [showSlotModal, setShowSlotModal] = useState(false);
@@ -186,6 +190,8 @@ export default function PlannerPage() {
     const start = today();
     setPlanForm({ name: "", startDate: start, endDate: addDays(start, 6) });
     setPlanDayError("");
+    setModalStep(1);
+    setAiPrompt("");
     setShowPlanModal(true);
   };
 
@@ -193,26 +199,56 @@ export default function PlannerPage() {
     setEditingPlan(plan);
     setPlanForm({ name: plan.name, startDate: plan.startDate, endDate: plan.endDate });
     setPlanDayError("");
+    setModalStep(1); // edit goes straight to step 1 only
+    setAiPrompt("");
     setShowPlanModal(true);
   };
 
-  const handlePlanSubmit = async (e) => {
+  // Step 1 submit: for new plans, advance to AI step; for edits, save directly
+  const handlePlanStep1 = (e) => {
     e.preventDefault();
     const err = validatePlanDates(planForm.startDate, planForm.endDate);
     if (err) { setPlanDayError(err); return; }
+    if (editingPlan) {
+      handlePlanSubmit();
+    } else {
+      setModalStep(2);
+    }
+  };
+
+  const handlePlanSubmit = async (skipAi = false) => {
     setStatus({ type: "", message: "" });
     try {
       if (editingPlan) {
         await updatePlan(token, editingPlan.planId, planForm);
         setStatus({ type: "success", message: "Plan updated." });
+        setShowPlanModal(false);
+        await loadPlans();
+        await loadPlanDetails(editingPlan.planId);
       } else {
+        // Create the blank plan first
         const created = await createPlan(token, planForm);
         setActivePlanId(created.planId);
-        setStatus({ type: "success", message: "Plan created!" });
+        setShowPlanModal(false);
+        await loadPlans();
+        // Now generate meals if the user gave a prompt
+        if (!skipAi && aiPrompt.trim()) {
+          setAiGenerating(true);
+          setStatus({ type: "", message: "" });
+          try {
+            const numDays = daysBetween(planForm.startDate, planForm.endDate);
+            await generateAiPlan(token, { planId: created.planId, prompt: aiPrompt.trim(), numDays });
+            setStatus({ type: "success", message: "✨ AI meal plan generated!" });
+          } catch (aiErr) {
+            setStatus({ type: "error", message: "Plan created, but AI generation failed: " + aiErr.message });
+          } finally {
+            setAiGenerating(false);
+          }
+          await loadPlanDetails(created.planId);
+        } else {
+          setStatus({ type: "success", message: "Plan created!" });
+        }
       }
-      setShowPlanModal(false);
-      await loadPlans();
-      if (activePlanId) await loadPlanDetails(editingPlan?.planId || activePlanId);
     } catch (e) {
       setStatus({ type: "error", message: e.message });
     }
@@ -381,6 +417,13 @@ export default function PlannerPage() {
           </div>
         )}
 
+        {aiGenerating && (
+          <div className="planner-ai-generating">
+            <span className="planner-ai-spinner" />
+            <span>✨ AI is building your meal plan… this may take a moment</span>
+          </div>
+        )}
+
         {!activePlan ? (
           <div className="planner-empty-state">
             <div className="planner-empty-icon">📋</div>
@@ -510,52 +553,99 @@ export default function PlannerPage() {
       {showPlanModal && (
         <div className="modal-backdrop" onClick={() => setShowPlanModal(false)}>
           <div className="modal planner-modal" onClick={(e) => e.stopPropagation()}>
-            <h3>{editingPlan ? "Edit Plan" : "Create New Plan"}</h3>
-            <form className="form-row" onSubmit={handlePlanSubmit}>
-              <div className="planner-form-field">
-                <label>Plan name</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Week 1 Healthy Eating"
-                  value={planForm.name}
-                  onChange={(e) => setPlanForm((p) => ({ ...p, name: e.target.value }))}
-                  required autoFocus
-                />
-              </div>
-              <div className="planner-form-row-2">
+
+            {/* ── Step 1: Name + Dates ── */}
+            {modalStep === 1 && (
+              <>
+                <h3>{editingPlan ? "Edit Plan" : "Create New Plan"}</h3>
+                <form className="form-row" onSubmit={handlePlanStep1}>
+                  <div className="planner-form-field">
+                    <label>Plan name</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Week 1 Healthy Eating"
+                      value={planForm.name}
+                      onChange={(e) => setPlanForm((p) => ({ ...p, name: e.target.value }))}
+                      required autoFocus
+                    />
+                  </div>
+                  <div className="planner-form-row-2">
+                    <div className="planner-form-field">
+                      <label>Start date</label>
+                      <input type="date" value={planForm.startDate}
+                        onChange={(e) => handlePlanDateChange("startDate", e.target.value)} required />
+                    </div>
+                    <div className="planner-form-field">
+                      <label>End date</label>
+                      <input type="date" value={planForm.endDate}
+                        min={planForm.startDate}
+                        max={addDays(planForm.startDate, MAX_PLAN_DAYS - 1)}
+                        onChange={(e) => handlePlanDateChange("endDate", e.target.value)} required />
+                    </div>
+                  </div>
+                  {planDayError && (
+                    <div className="alert" style={{ padding: "8px 12px", fontSize: 13 }}>{planDayError}</div>
+                  )}
+                  {planForm.startDate && planForm.endDate && !planDayError && (
+                    <div style={{ fontSize: 13, color: "#6b7280" }}>
+                      📅 {daysBetween(planForm.startDate, planForm.endDate)} day{daysBetween(planForm.startDate, planForm.endDate) !== 1 ? "s" : ""} (max {MAX_PLAN_DAYS})
+                    </div>
+                  )}
+                  {editingPlan && (
+                    <div style={{ fontSize: 12, color: "#b45309", background: "#fef3c7", padding: "8px 12px", borderRadius: 6 }}>
+                      ⚠️ Shortening the plan will permanently delete meals beyond the new end date.
+                    </div>
+                  )}
+                  <div className="inventory-actions">
+                    <button type="submit" className="primary-btn" disabled={!!planDayError}>
+                      {editingPlan ? "Save changes" : "Next →"}
+                    </button>
+                    <button type="button" className="secondary-btn" onClick={() => setShowPlanModal(false)}>Cancel</button>
+                  </div>
+                </form>
+              </>
+            )}
+
+            {/* ── Step 2: AI Prompt (create only) ── */}
+            {modalStep === 2 && (
+              <>
+                <div className="planner-ai-step-header">
+                  <button className="planner-back-btn" onClick={() => setModalStep(1)}>← Back</button>
+                  <h3>✨ Generate meals with AI</h3>
+                </div>
+                <p className="planner-ai-step-sub">
+                  Describe what you're looking for — dietary preferences, goals, cuisine style, or anything else.
+                  The AI will fill your {daysBetween(planForm.startDate, planForm.endDate)}-day plan using recipes from the database.
+                </p>
                 <div className="planner-form-field">
-                  <label>Start date</label>
-                  <input type="date" value={planForm.startDate}
-                    onChange={(e) => handlePlanDateChange("startDate", e.target.value)} required />
+                  <label>Your preferences</label>
+                  <textarea
+                    className="planner-ai-textarea"
+                    placeholder="e.g. High protein, no dairy, Mediterranean style, easy to prepare…"
+                    value={aiPrompt}
+                    onChange={(e) => setAiPrompt(e.target.value)}
+                    rows={4}
+                    autoFocus
+                  />
                 </div>
-                <div className="planner-form-field">
-                  <label>End date</label>
-                  <input type="date" value={planForm.endDate}
-                    min={planForm.startDate}
-                    max={addDays(planForm.startDate, MAX_PLAN_DAYS - 1)}
-                    onChange={(e) => handlePlanDateChange("endDate", e.target.value)} required />
+                <div className="planner-ai-actions">
+                  <button
+                    className="primary-btn planner-ai-generate-btn"
+                    onClick={() => handlePlanSubmit(false)}
+                    disabled={!aiPrompt.trim()}
+                  >
+                    ✨ Create &amp; Generate plan
+                  </button>
+                  <button
+                    className="secondary-btn"
+                    onClick={() => handlePlanSubmit(true)}
+                  >
+                    Skip — create blank plan
+                  </button>
                 </div>
-              </div>
-              {planDayError && (
-                <div className="alert" style={{ padding: "8px 12px", fontSize: 13 }}>{planDayError}</div>
-              )}
-              {planForm.startDate && planForm.endDate && !planDayError && (
-                <div style={{ fontSize: 13, color: "#6b7280" }}>
-                  📅 {daysBetween(planForm.startDate, planForm.endDate)} day{daysBetween(planForm.startDate, planForm.endDate) !== 1 ? "s" : ""} (max {MAX_PLAN_DAYS})
-                </div>
-              )}
-              {editingPlan && (
-                <div style={{ fontSize: 12, color: "#b45309", background: "#fef3c7", padding: "8px 12px", borderRadius: 6 }}>
-                  ⚠️ Shortening the plan will permanently delete meals beyond the new end date.
-                </div>
-              )}
-              <div className="inventory-actions">
-                <button type="submit" className="primary-btn" disabled={!!planDayError}>
-                  {editingPlan ? "Save changes" : "Create plan"}
-                </button>
-                <button type="button" className="secondary-btn" onClick={() => setShowPlanModal(false)}>Cancel</button>
-              </div>
-            </form>
+              </>
+            )}
+
           </div>
         </div>
       )}

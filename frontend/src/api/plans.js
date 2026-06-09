@@ -39,3 +39,13 @@ export function updatePlanDetail(token, detailId, isFollowed) {
 export function deletePlanDetail(token, detailId) {
   return apiRequest(`/api/plans/details/${detailId}`, { method: "DELETE", token });
 }
+
+// ── AI Plan Generation ────────────────────────────────────────────────────────
+
+export function generateAiPlan(token, { planId, prompt, numDays }) {
+  return apiRequest("/api/ai/generate-plan", {
+    method: "POST",
+    token,
+    body: { planId, prompt, numDays },
+  });
+}

@@ -119,6 +119,31 @@ public class LlmClient {
             names.add(matcher.group(2).trim());
         }
 
+        if (systemPrompt.contains("meal planning") || systemPrompt.contains("mealType")) {
+            int numDays = 7;
+            Pattern dayPattern = Pattern.compile("structured meal plan for (\\d+) day");
+            Matcher dayMatcher = dayPattern.matcher(systemPrompt);
+            if (dayMatcher.find()) {
+                try {
+                    numDays = Integer.parseInt(dayMatcher.group(1));
+                } catch (Exception ignored) {}
+            }
+
+            List<String> assignments = new ArrayList<>();
+            String[] meals = {"breakfast", "lunch", "dinner", "snack"};
+            int recipeIdx = 0;
+            if (!ids.isEmpty()) {
+                for (int day = 1; day <= numDays; day++) {
+                    for (String meal : meals) {
+                        int recipeId = ids.get(recipeIdx % ids.size());
+                        assignments.add(String.format("{\"dayNumber\":%d,\"mealType\":\"%s\",\"recipeId\":%d}", day, meal, recipeId));
+                        recipeIdx++;
+                    }
+                }
+            }
+            return "[" + String.join(",", assignments) + "]";
+        }
+
         if (ids.isEmpty()) {
             return "{\n" +
                     "  \"agent1Response\": \"I couldn't find any specific recipes in the database matching your search, but I can help you search for other options!\",\n" +

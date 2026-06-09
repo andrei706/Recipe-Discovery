@@ -24,7 +24,7 @@ export default function InventoryPage() {
 
   const selectedIngredient = useMemo(() => {
     const id = Number(form.ingredientId);
-    return ingredients.find((item) => item.ingredientId === id);
+    return ingredients.find((item) => item.ingredientId === id) || null;
   }, [ingredients, form.ingredientId]);
 
   const filteredInventory = useMemo(() => {
@@ -233,7 +233,7 @@ export default function InventoryPage() {
             setSearchQuery("");
           }}
         >
-          <div className="modal" onClick={(event) => event.stopPropagation()}>
+          <div className="modal" style={{ width: "min(520px, 95vw)" }} onClick={(event) => event.stopPropagation()}>
             <h3>Add ingredient</h3>
             <form className="form-row" onSubmit={handleAddSubmit}>
               <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
@@ -247,18 +247,31 @@ export default function InventoryPage() {
                   autoFocus
                 />
               </div>
-              <select
-                value={form.ingredientId}
-                onChange={(event) => setForm((prev) => ({ ...prev, ingredientId: event.target.value }))}
-                required
-              >
-                <option value="">Select ingredient</option>
-                {filteredIngredients.map((ingredient) => (
-                  <option key={ingredient.ingredientId} value={ingredient.ingredientId}>
-                    {ingredient.name}
-                  </option>
-                ))}
-              </select>
+              {/* Card picker */}
+              <div className="planner-form-field">
+                <label style={{ fontSize: "12px", fontWeight: "600", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                  Select ingredient
+                </label>
+                <div className="planner-recipe-picker">
+                  {filteredIngredients.length === 0 && (
+                    <div className="planner-recipe-picker-empty">No ingredients found.</div>
+                  )}
+                  {filteredIngredients.map((ing) => {
+                    const isSelected = form.ingredientId === String(ing.ingredientId);
+                    return (
+                      <button
+                        key={ing.ingredientId}
+                        type="button"
+                        className={`planner-recipe-card ${isSelected ? "selected" : ""}`}
+                        onClick={() => setForm((prev) => ({ ...prev, ingredientId: String(ing.ingredientId) }))}
+                      >
+                        <span className="planner-recipe-card-name">{ing.name}</span>
+                        <span className="planner-recipe-card-meta">Unit: {ing.measurementUnit}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
               <input
                 type="number"
                 min="1"
