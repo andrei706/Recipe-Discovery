@@ -9,5 +9,6 @@ import java.util.List;
 @Repository
 public interface PlanDetailsRepository extends JpaRepository<PlanDetails, Integer> {
     List<PlanDetails> findByPlanPlanId(Integer planId);
+    void deleteByPlanPlanIdAndDayNumberGreaterThan(Integer planId, int dayNumber);
 }
 

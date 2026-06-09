@@ -3,10 +3,12 @@ import com.mds.recipediscovery.dto.CreatePlanDTO;
 import com.mds.recipediscovery.dto.PlanResponseDTO;
 import com.mds.recipediscovery.models.Plan;
 import com.mds.recipediscovery.models.User;
+import com.mds.recipediscovery.repository.PlanDetailsRepository;
 import com.mds.recipediscovery.repository.PlanRepository;
 import com.mds.recipediscovery.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 @Service
@@ -14,9 +16,11 @@ import java.util.stream.Collectors;
 public class PlanService {
     private final PlanRepository planRepository;
     private final UserRepository userRepository;
-    public PlanService(PlanRepository planRepository, UserRepository userRepository) {
+    private final PlanDetailsRepository planDetailsRepository;
+    public PlanService(PlanRepository planRepository, UserRepository userRepository, PlanDetailsRepository planDetailsRepository) {
         this.planRepository = planRepository;
         this.userRepository = userRepository;
+        this.planDetailsRepository = planDetailsRepository;
     }
     public PlanResponseDTO createPlan(Integer userId, CreatePlanDTO dto) {
         User user = userRepository.findById(userId)
@@ -38,6 +42,9 @@ public class PlanService {
         if (dto.getStartDate().isAfter(dto.getEndDate())) {
             throw new IllegalArgumentException("Start date cannot be after end date");
         }
+        // Calculate new plan duration and remove details that fall outside it
+        long newDayCount = ChronoUnit.DAYS.between(dto.getStartDate(), dto.getEndDate()) + 1;
+        planDetailsRepository.deleteByPlanPlanIdAndDayNumberGreaterThan(planId, (int) newDayCount);
         plan.setName(dto.getName());
         plan.setStartDate(dto.getStartDate());
         plan.setEndDate(dto.getEndDate());
