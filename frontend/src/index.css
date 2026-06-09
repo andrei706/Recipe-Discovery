@@ -234,6 +234,41 @@ a {
   width: min(480px, 92vw);
 }
 
+.cook-confirm-modal {
+  display: grid;
+  gap: 14px;
+  text-align: center;
+  width: min(520px, 92vw);
+}
+
+.cook-confirm-icon {
+  justify-self: center;
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  border-radius: 999px;
+  color: #c2410c;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 7px 14px;
+}
+
+.cook-confirm-modal h3 {
+  margin: 0;
+}
+
+.cook-confirm-modal p {
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.cook-confirm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 .split-layout {
   display: grid;
   grid-template-columns: 3fr 1fr;
@@ -327,19 +362,93 @@ a {
 }
 
 .instructions-shell {
-  max-width: 760px;
+  max-width: 820px;
   margin: 0 auto;
+}
+
+.instructions-header {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.instructions-header h2 {
+  font-size: 30px;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.instructions-eyebrow {
+  color: #c2410c;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .instructions-subtitle {
   color: #6b7280;
-  margin: 6px 0 0;
+  margin: 0;
 }
 
-.instructions-card p {
+.instructions-card {
+  background: #fff;
+  border: 1px solid #fed7aa;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(124, 45, 18, 0.08);
+  padding: 22px;
+}
+
+.instructions-steps {
+  display: grid;
+  gap: 14px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.instructions-steps li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.instructions-step-number {
+  align-items: center;
+  background: #f28c28;
+  border-radius: 999px;
+  color: #fff;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 800;
+  height: 32px;
+  justify-content: center;
+  width: 32px;
+}
+
+.instructions-steps p,
+.instructions-notes p,
+.instructions-empty {
+  color: #374151;
   line-height: 1.7;
   margin: 0;
   white-space: pre-wrap;
+}
+
+.instructions-notes {
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  border-radius: 10px;
+  margin-top: 20px;
+  padding: 14px 16px;
+}
+
+.instructions-notes-title {
+  color: #c2410c;
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 6px;
 }
 
 @media (max-width: 850px) {

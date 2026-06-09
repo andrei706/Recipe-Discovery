@@ -9,6 +9,8 @@ export default function RecipePage() {
   const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showCookModal, setShowCookModal] = useState(false);
+  const [cookLoading, setCookLoading] = useState(false);
   const [status, setStatus] = useState({ type: "", message: "" });
 
   useEffect(() => {
@@ -18,26 +20,32 @@ export default function RecipePage() {
       .finally(() => setLoading(false));
   }, [recipeId, token]);
 
-  const handleCook = async () => {
-    const shouldDeductIngredients = window.confirm(
-      "Do you want to remove the required ingredients from your inventory?"
-    );
-
+  const openCookModal = () => {
     setStatus({ type: "", message: "" });
-    if (!shouldDeductIngredients) {
-      navigate(`/recipe/${recipeId}/instructions`, {
-        state: { status: { type: "success", message: "Recipe opened without changing your inventory." } }
-      });
-      return;
-    }
+    setShowCookModal(true);
+  };
 
+  const continueWithoutDeducting = () => {
+    setShowCookModal(false);
+    navigate(`/recipe/${recipeId}/instructions`, {
+      state: { status: { type: "success", message: "Recipe opened without changing your inventory." } }
+    });
+  };
+
+  const cookAndDeductIngredients = async () => {
+    setCookLoading(true);
+    setStatus({ type: "", message: "" });
     try {
       await cookRecipe(token, recipeId);
+      setShowCookModal(false);
       navigate(`/recipe/${recipeId}/instructions`, {
         state: { status: { type: "success", message: "Ingredients have been deducted from your inventory." } }
       });
     } catch (err) {
       setStatus({ type: "error", message: err.message });
+      setShowCookModal(false);
+    } finally {
+      setCookLoading(false);
     }
   };
 
@@ -136,12 +144,43 @@ export default function RecipePage() {
             <button type="button" className="secondary-btn" onClick={() => navigate(-1)}>
               Back
             </button>
-            <button type="button" className="primary-btn" onClick={handleCook}>
+            <button type="button" className="primary-btn" onClick={openCookModal}>
               Cook recipe
             </button>
           </div>
         </div>
       </div>
+
+      {showCookModal ? (
+        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="cook-modal-title">
+          <div className="modal cook-confirm-modal">
+            <div className="cook-confirm-icon">Cook</div>
+            <h3 id="cook-modal-title">Remove ingredients from inventory?</h3>
+            <p>
+              You can deduct the required ingredients now, or keep your inventory unchanged and continue to the
+              preparation instructions.
+            </p>
+            <div className="cook-confirm-actions">
+              <button
+                type="button"
+                className="secondary-btn"
+                onClick={continueWithoutDeducting}
+                disabled={cookLoading}
+              >
+                No, keep inventory
+              </button>
+              <button
+                type="button"
+                className="primary-btn"
+                onClick={cookAndDeductIngredients}
+                disabled={cookLoading}
+              >
+                {cookLoading ? "Cooking..." : "Yes, remove items"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
