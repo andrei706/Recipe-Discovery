@@ -140,7 +140,7 @@ export default function RecipePage() {
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: 12 }}>
+          <div className="recipe-action-row">
             <button type="button" className="secondary-btn" onClick={() => navigate(-1)}>
               Back
             </button>

@@ -141,14 +141,13 @@ export default function InventoryPage() {
     <div className="grid" style={{ gap: 20 }}>
       <div className="section-header">
         <h2>Inventory</h2>
-        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+        <div className="inventory-toolbar">
           <input
             type="text"
             className="search-input"
             placeholder="Search in inventory..."
             value={inventorySearch}
             onChange={(e) => setInventorySearch(e.target.value)}
-            style={{ width: "250px" }}
           />
           <button
             type="button"
@@ -233,7 +232,7 @@ export default function InventoryPage() {
             setSearchQuery("");
           }}
         >
-          <div className="modal" style={{ width: "min(520px, 95vw)" }} onClick={(event) => event.stopPropagation()}>
+          <div className="modal inventory-modal" onClick={(event) => event.stopPropagation()}>
             <h3>Add ingredient</h3>
             <form className="form-row" onSubmit={handleAddSubmit}>
               <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>

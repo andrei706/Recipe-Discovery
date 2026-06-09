@@ -112,11 +112,11 @@ export default function RecipesPage() {
   };
 
   return (
-    <div className="split-layout">
-      <div className="grid" style={{ gap: 16 }}>
+    <div className="split-layout recipes-layout">
+      <div className="grid recipes-results-panel" style={{ gap: 16 }}>
         <div className="section-header">
           <h2>Recipes</h2>
-          <div className="form-row" style={{ gridAutoFlow: "column", gap: 8 }}>
+          <div className="form-row view-toggle-row">
             {VIEW_OPTIONS.map((option) => (
               <button
                 key={option.id}
@@ -162,7 +162,7 @@ export default function RecipesPage() {
         </div>
       </div>
 
-      <div className="grid" style={{ gap: 16 }}>
+      <div className="grid recipes-filter-panel" style={{ gap: 16 }}>
         <DietFilter value={dietFilters} onChange={setDietFilters} />
       </div>
     </div>

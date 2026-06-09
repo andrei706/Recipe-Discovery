@@ -349,13 +349,14 @@ export default function AIChefPage() {
           ) : (
             <div className="ingredient-chips-container">
               {inventory.map((item) => (
-                <div
+                <button
                   key={item.ingredientId}
+                  type="button"
                   className="ingredient-chip"
                   onClick={() => handleIngredientClick(item.ingredientName)}
                 >
                   ➕ {item.ingredientName} ({item.quantity} {item.measurementUnit})
-                </div>
+                </button>
               ))}
             </div>
           )}

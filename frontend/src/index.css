@@ -9,9 +9,14 @@
   box-sizing: border-box;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 a {
@@ -19,8 +24,36 @@ a {
   text-decoration: none;
 }
 
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  touch-action: manipulation;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(242, 140, 40, 0.45);
+  outline-offset: 2px;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
 .app-shell {
   min-height: 100vh;
+  overflow-x: clip;
 }
 
 .topbar {
@@ -30,35 +63,86 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 16px;
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
+.topbar-main {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 12px;
+  justify-content: space-between;
+}
+
 .topbar .brand {
   font-weight: 700;
   font-size: 18px;
+  flex: 0 0 auto;
 }
 
-.topbar nav {
+.topbar-nav {
   display: flex;
   gap: 16px;
   align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.topbar-nav > a,
+.topbar-nav > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  white-space: nowrap;
 }
 
 .topbar button {
   border: none;
   background: #fff;
   color: #f28c28;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
   padding: 8px 12px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
+  white-space: nowrap;
+}
+
+.topbar .mobile-menu-btn {
+  display: none;
+}
+
+.nav-icon {
+  display: none;
+  flex: 0 0 auto;
+  height: 18px;
+  width: 18px;
+}
+
+.mobile-menu-btn .nav-icon {
+  display: block;
+  height: 22px;
+  width: 22px;
+}
+
+.topbar .theme-toggle-btn {
+  background: #fff7ed;
+  border: 1px solid rgba(255, 255, 255, 0.55);
 }
 
 .app-content {
   padding: 24px;
+  width: 100%;
+  max-width: 100vw;
 }
 
 .card {
@@ -105,6 +189,14 @@ a {
   padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid #d1d5db;
+  min-width: 0;
+  width: 100%;
+}
+
+.view-toggle-row {
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  gap: 8px;
 }
 
 .diet-filter-list {
@@ -174,6 +266,7 @@ a {
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
+  min-height: 42px;
 }
 
 .secondary-btn {
@@ -184,6 +277,7 @@ a {
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
+  min-height: 42px;
 }
 
 .alert {
@@ -224,6 +318,8 @@ a {
   background: rgba(15, 23, 42, 0.45);
   display: grid;
   place-items: center;
+  overflow-y: auto;
+  padding: 16px;
   z-index: 20;
 }
 
@@ -232,6 +328,8 @@ a {
   padding: 20px;
   border-radius: 12px;
   width: min(480px, 92vw);
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
 }
 
 .cook-confirm-modal {
@@ -309,6 +407,22 @@ a {
   flex-wrap: wrap;
 }
 
+.inventory-toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.inventory-toolbar .search-input {
+  width: 250px;
+  max-width: 100%;
+}
+
+.inventory-modal {
+  width: min(520px, 95vw);
+}
+
 .green-btn {
   background: #dcfce7;
   color: #166534;
@@ -317,6 +431,7 @@ a {
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
+  min-height: 42px;
 }
 
 .danger-btn {
@@ -327,6 +442,7 @@ a {
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
+  min-height: 42px;
 }
 
 .recipe-ingredients {
@@ -348,6 +464,12 @@ a {
 .recipe-ingredients-empty {
   color: #6b7280;
   font-size: 13px;
+}
+
+.recipe-action-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .recipe-details-layout {
@@ -433,6 +555,7 @@ a {
   color: #374151;
   line-height: 1.7;
   margin: 0;
+  overflow-wrap: anywhere;
   white-space: pre-wrap;
 }
 
@@ -499,6 +622,7 @@ a {
   border-radius: 12px;
   font-size: 14px;
   line-height: 1.5;
+  overflow-wrap: anywhere;
   white-space: pre-line;
 }
 
@@ -604,6 +728,8 @@ a {
   border: 1px solid #d1d5db;
   border-radius: 20px;
   font-size: 13px;
+  font-weight: 500;
+  text-align: left;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -739,6 +865,7 @@ a {
 .planner-main {
   padding: 24px;
   overflow-x: auto;
+  min-width: 0;
 }
 
 .planner-status {
@@ -1206,7 +1333,7 @@ a {
 }
 
 .planner-ing-table-wrap {
-  overflow-y: auto;
+  overflow: auto;
   flex: 1;
   border: 1px solid #e5e7eb;
   border-radius: 10px;
@@ -1214,6 +1341,7 @@ a {
 
 .planner-ing-table {
   width: 100%;
+  min-width: 520px;
   border-collapse: collapse;
   font-size: 13px;
 }
@@ -1422,4 +1550,521 @@ a {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* Responsive layout */
+@media (max-width: 900px) {
+  .app-content {
+    padding: 20px;
+  }
+
+  .split-layout {
+    gap: 20px;
+  }
+
+  .planner-shell {
+    margin: -20px;
+  }
+}
+
+@media (max-width: 860px) {
+  .planner-shell {
+    min-height: auto;
+  }
+
+  .planner-sidebar {
+    position: static;
+    top: auto;
+    height: auto;
+    max-height: 300px;
+    border-right: 0;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 16px 0;
+  }
+
+  .planner-main {
+    overflow-x: hidden;
+    padding: 20px;
+  }
+
+  .planner-calendar {
+    gap: 12px;
+    scroll-snap-type: x proximity;
+  }
+
+  .planner-day-col {
+    flex-basis: 220px;
+    min-width: 220px;
+    scroll-snap-align: start;
+  }
+
+  .planner-progress-wrap {
+    min-width: min(100%, 220px);
+    width: 100%;
+  }
+}
+
+@media (max-width: 720px) {
+  .topbar {
+    align-items: stretch;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: 1fr;
+    padding: 12px 14px;
+  }
+
+  .topbar-main {
+    width: 100%;
+  }
+
+  .topbar .brand {
+    width: auto;
+  }
+
+  .topbar .mobile-menu-btn {
+    background: #fff7ed;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    color: #c2410c;
+    display: inline-flex;
+    min-height: 42px;
+    min-width: 42px;
+    padding: 8px;
+  }
+
+  .topbar-nav {
+    border-top: 1px solid rgba(255, 255, 255, 0.34);
+    display: none;
+    gap: 8px;
+    grid-template-columns: 1fr;
+    justify-content: flex-start;
+    margin-top: 2px;
+    padding-top: 10px;
+    width: 100%;
+  }
+
+  .topbar-nav.open {
+    display: grid;
+  }
+
+  .topbar-nav > a,
+  .topbar-nav > span,
+  .topbar-nav > button {
+    border-radius: 8px;
+    font-size: 13px;
+    justify-content: flex-start;
+    min-height: 42px;
+    padding: 9px 10px;
+    width: 100%;
+  }
+
+  .topbar-nav > a,
+  .topbar-nav > span {
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  .topbar-nav > a.active {
+    background: rgba(255, 255, 255, 0.24);
+  }
+
+  .topbar-nav .nav-icon {
+    display: block;
+  }
+
+  .recipes-filter-panel {
+    order: -1;
+  }
+
+  .recipes-results-panel {
+    order: 0;
+  }
+
+  .app-content {
+    padding: 16px;
+  }
+
+  .planner-shell {
+    margin: -16px;
+  }
+
+  .card,
+  .modal,
+  .instructions-card {
+    border-radius: 10px;
+    padding: 14px;
+  }
+
+  .auth-card {
+    margin: 24px auto;
+    max-width: 100%;
+  }
+
+  .section-header {
+    align-items: flex-start;
+  }
+
+  .section-header h2,
+  .section-header h3 {
+    margin-top: 0;
+  }
+
+  .view-toggle-row {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .view-toggle-row button,
+  .inventory-toolbar,
+  .inventory-toolbar .search-input {
+    width: 100%;
+  }
+
+  .recipe-action-row > button,
+  .cook-confirm-actions > button,
+  .inventory-actions > button {
+    flex: 1 1 140px;
+  }
+
+  .modal-backdrop {
+    align-items: start;
+  }
+
+  .cook-confirm-modal {
+    text-align: left;
+  }
+
+  .cook-confirm-icon {
+    justify-self: start;
+  }
+
+  .chat-container {
+    border-radius: 10px;
+    height: calc(100vh - 190px);
+    min-height: 420px;
+  }
+
+  .chat-header {
+    padding: 14px 16px;
+  }
+
+  .chat-messages {
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .chat-message {
+    max-width: 100%;
+    padding: 10px 12px;
+  }
+
+  .chat-input-area {
+    flex-direction: column;
+    padding: 12px;
+  }
+
+  .chat-input-area button {
+    width: 100%;
+  }
+
+  .sidebar-ingredients {
+    max-height: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .grid {
+    gap: 12px;
+  }
+
+  .grid-3,
+  .inventory-grid,
+  .recipe-ingredients {
+    grid-template-columns: 1fr;
+  }
+
+  .diet-filter-toggle {
+    flex: 1 1 calc(50% - 10px);
+    justify-content: center;
+    text-align: center;
+  }
+
+  .diet-tag-btn {
+    min-height: 34px;
+  }
+
+  .instructions-header h2 {
+    font-size: 24px;
+  }
+
+  .instructions-steps li {
+    gap: 8px;
+    grid-template-columns: 1fr;
+  }
+
+  .instructions-step-number {
+    height: 28px;
+    width: 28px;
+  }
+
+  .planner-shell {
+    margin: -16px;
+  }
+
+  .planner-sidebar {
+    max-height: none;
+  }
+
+  .planner-sidebar-header,
+  .planner-ai-step-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .planner-main {
+    padding: 16px;
+  }
+
+  .planner-plan-header {
+    gap: 12px;
+  }
+
+  .planner-plan-title {
+    font-size: 20px;
+  }
+
+  .planner-day-col {
+    flex-basis: min(82vw, 280px);
+    min-width: min(82vw, 280px);
+  }
+
+  .planner-day-footer,
+  .planner-details-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .planner-footer-btn,
+  .planner-details-footer .primary-btn,
+  .planner-details-footer .secondary-btn,
+  .planner-details-footer .danger-btn {
+    width: 100%;
+  }
+
+  .planner-form-row-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .planner-details-modal {
+    max-height: calc(100vh - 32px);
+  }
+}
+
+@media (max-width: 380px) {
+  .diet-filter-toggle {
+    flex-basis: 100%;
+  }
+
+  .topbar-nav > a,
+  .topbar-nav > span,
+  .topbar-nav > button,
+  .mobile-menu-btn {
+    font-size: 12px;
+  }
+}
+
+/* Dark mode */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  color: #e5e7eb;
+  background: #0f1117;
+}
+
+[data-theme="dark"] body,
+[data-theme="dark"] .app-shell,
+[data-theme="dark"] .app-content {
+  background: #0f1117;
+  color: #e5e7eb;
+}
+
+[data-theme="dark"] .topbar {
+  background: #151922;
+  border-bottom: 1px solid #7c2d12;
+  color: #f9fafb;
+}
+
+[data-theme="dark"] .topbar .brand {
+  color: #fed7aa;
+}
+
+[data-theme="dark"] .topbar a,
+[data-theme="dark"] .topbar span {
+  color: #f9fafb;
+}
+
+[data-theme="dark"] .topbar a.active {
+  color: #fed7aa;
+}
+
+[data-theme="dark"] .topbar button {
+  background: #2a1b12;
+  border: 1px solid #9a3412;
+  color: #fed7aa;
+}
+
+[data-theme="dark"] .card,
+[data-theme="dark"] .modal,
+[data-theme="dark"] .instructions-card,
+[data-theme="dark"] .chat-container,
+[data-theme="dark"] .chat-message.ai,
+[data-theme="dark"] .planner-sidebar,
+[data-theme="dark"] .planner-meal-slot,
+[data-theme="dark"] .planner-meal-entry,
+[data-theme="dark"] .planner-recipe-card {
+  background: #171b24;
+  border-color: #2f3542;
+  color: #e5e7eb;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] .inventory-title,
+[data-theme="dark"] .planner-plan-title,
+[data-theme="dark"] .planner-plan-item-name,
+[data-theme="dark"] .planner-meal-name,
+[data-theme="dark"] .planner-recipe-card-name,
+[data-theme="dark"] .planner-details-header h3,
+[data-theme="dark"] .planner-ai-step-header h3 {
+  color: #f9fafb;
+}
+
+[data-theme="dark"] .auth-switch,
+[data-theme="dark"] .instructions-subtitle,
+[data-theme="dark"] .recipe-ingredients-empty,
+[data-theme="dark"] .planner-empty-state,
+[data-theme="dark"] .planner-plan-dates,
+[data-theme="dark"] .planner-progress-label,
+[data-theme="dark"] .planner-details-subtitle,
+[data-theme="dark"] .planner-ai-step-sub,
+[data-theme="dark"] .planner-recipe-card-meta,
+[data-theme="dark"] .instructions-steps p,
+[data-theme="dark"] .instructions-notes p,
+[data-theme="dark"] .instructions-empty {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .form-row input,
+[data-theme="dark"] .form-row select,
+[data-theme="dark"] .search-input,
+[data-theme="dark"] .chat-input-area input,
+[data-theme="dark"] .planner-form-field input,
+[data-theme="dark"] .planner-form-field select,
+[data-theme="dark"] .planner-ai-textarea {
+  background: #10131a;
+  border-color: #374151;
+  color: #f9fafb;
+}
+
+[data-theme="dark"] .form-row input::placeholder,
+[data-theme="dark"] .search-input::placeholder,
+[data-theme="dark"] .chat-input-area input::placeholder,
+[data-theme="dark"] .planner-ai-textarea::placeholder {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .secondary-btn,
+[data-theme="dark"] .diet-filter-toggle,
+[data-theme="dark"] .diet-tag-btn,
+[data-theme="dark"] .ingredient-chip,
+[data-theme="dark"] .planner-footer-btn,
+[data-theme="dark"] .planner-back-btn {
+  background: #2a1b12;
+  border-color: #9a3412;
+  color: #fed7aa;
+}
+
+[data-theme="dark"] .primary-btn,
+[data-theme="dark"] .diet-filter-toggle.selected,
+[data-theme="dark"] .planner-add-meal-btn,
+[data-theme="dark"] .planner-ai-generate-btn {
+  background: #f28c28;
+  border-color: #f28c28;
+  color: #fff;
+}
+
+[data-theme="dark"] .secondary-btn:hover,
+[data-theme="dark"] .diet-filter-toggle:hover,
+[data-theme="dark"] .diet-tag-btn:hover,
+[data-theme="dark"] .ingredient-chip:hover,
+[data-theme="dark"] .planner-footer-btn:hover:not(:disabled),
+[data-theme="dark"] .planner-back-btn:hover {
+  background: #3b2416;
+  border-color: #f28c28;
+  color: #ffedd5;
+}
+
+[data-theme="dark"] .badge,
+[data-theme="dark"] .cook-confirm-icon,
+[data-theme="dark"] .instructions-notes,
+[data-theme="dark"] .planner-day-label,
+[data-theme="dark"] .planner-qty-badge,
+[data-theme="dark"] .planner-details-meal-badge,
+[data-theme="dark"] .planner-ai-generating {
+  background: #2a1b12;
+  border-color: #9a3412;
+  color: #fed7aa;
+}
+
+[data-theme="dark"] .alert {
+  background: #3f1218;
+  color: #fecaca;
+}
+
+[data-theme="dark"] .success,
+[data-theme="dark"] .agent2-container,
+[data-theme="dark"] .planner-meal-entry.followed {
+  background: #102416;
+  border-color: #166534;
+  color: #bbf7d0;
+}
+
+[data-theme="dark"] .modal-backdrop {
+  background: rgba(0, 0, 0, 0.68);
+}
+
+[data-theme="dark"] .chat-messages,
+[data-theme="dark"] .chat-input-area,
+[data-theme="dark"] .planner-main,
+[data-theme="dark"] .planner-recipe-picker,
+[data-theme="dark"] .planner-ing-table thead {
+  background: #10131a;
+}
+
+[data-theme="dark"] .chat-message.user,
+[data-theme="dark"] .chat-header {
+  background: linear-gradient(135deg, #c2410c, #f28c28);
+  color: #fff;
+}
+
+[data-theme="dark"] .planner-plan-item:hover,
+[data-theme="dark"] .planner-plan-item.active,
+[data-theme="dark"] .planner-recipe-card:hover,
+[data-theme="dark"] .planner-recipe-card.selected,
+[data-theme="dark"] .planner-ing-table tbody tr:hover td {
+  background: #221812;
+  border-color: #9a3412;
+}
+
+[data-theme="dark"] .planner-ing-table th,
+[data-theme="dark"] .planner-ing-table td {
+  border-color: #2f3542;
+  color: #e5e7eb;
+}
+
+[data-theme="dark"] .planner-ing-table-wrap,
+[data-theme="dark"] .planner-sidebar-header,
+[data-theme="dark"] .planner-day-footer {
+  border-color: #2f3542;
 }

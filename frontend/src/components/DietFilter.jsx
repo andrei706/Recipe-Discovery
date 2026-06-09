@@ -14,7 +14,7 @@ export default function DietFilter({ value, onChange }) {
   return (
     <div className="card">
       <h3>Diet filter</h3>
-      <div className="diet-filter-list">
+      <div className="diet-filter-list" role="group" aria-label="Diet filters">
         {DIETS.map((diet) => (
           <button
             key={diet.id}

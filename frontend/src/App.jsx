@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import TopBar from "./components/TopBar.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
@@ -11,10 +12,25 @@ import AIChefPage from "./pages/AIChefPage.jsx";
 import PlannerPage from "./pages/PlannerPage.jsx";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 
+const THEME_STORAGE_KEY = "rd_theme";
+
 export default function App() {
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem(THEME_STORAGE_KEY) === "dark" ? "dark" : "light";
+  });
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((currentTheme) => (currentTheme === "dark" ? "light" : "dark"));
+  };
+
   return (
     <div className="app-shell">
-      <TopBar />
+      <TopBar theme={theme} onToggleTheme={toggleTheme} />
       <div className="app-content">
         <Routes>
           <Route path="/login" element={<LoginPage />} />
