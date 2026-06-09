@@ -16,29 +16,40 @@ export default function RecipePage() {
       .then(setData)
       .catch((err) => setStatus({ type: "error", message: err.message }))
       .finally(() => setLoading(false));
-  }, [recipeId]);
+  }, [recipeId, token]);
 
   const handleCook = async () => {
-    const confirmCook = window.confirm("Are you sure you want to cook this recipe? The required ingredients will be deducted from your inventory.");
-    if (!confirmCook) return;
+    const shouldDeductIngredients = window.confirm(
+      "Do you want to remove the required ingredients from your inventory?"
+    );
 
     setStatus({ type: "", message: "" });
+    if (!shouldDeductIngredients) {
+      navigate(`/recipe/${recipeId}/instructions`, {
+        state: { status: { type: "success", message: "Recipe opened without changing your inventory." } }
+      });
+      return;
+    }
+
     try {
       await cookRecipe(token, recipeId);
-      setStatus({ type: "success", message: "Recipe has been cooked successfully! Ingredients have been deducted from inventory." });
-      setTimeout(() => {
-        navigate("/", { state: { status: { type: "success", message: "Recipe has been cooked successfully! Ingredients have been deducted from inventory." } } });
-      }, 1500);
+      navigate(`/recipe/${recipeId}/instructions`, {
+        state: { status: { type: "success", message: "Ingredients have been deducted from your inventory." } }
+      });
     } catch (err) {
       setStatus({ type: "error", message: err.message });
     }
+  };
+
+  const handleDietClick = (dietName) => {
+    navigate("/", { state: { dietFilters: [dietName] } });
   };
 
   if (loading) return <div className="card">Loading...</div>;
   if (!data) return null;
 
   const { recipe, matchedIngredients, totalIngredients, matchPercentage, ingredients } = data;
-  const dietNames = recipe.dietClassifications?.map((d) => d.name).join(", ");
+  const diets = recipe.dietClassifications || [];
   const haveList = (ingredients || []).filter((i) => i.missingQuantity === 0);
   const missingList = (ingredients || []).filter((i) => i.missingQuantity > 0);
 
@@ -55,8 +66,7 @@ export default function RecipePage() {
         </div>
       ) : null}
 
-      <div className="recipe-details-layout">
-        {/* Coloana Stângă: Info Nutriționale, Ingrediente și Acțiuni */}
+      <div className="recipe-details-layout recipe-details-layout-single">
         <div className="grid" style={{ gap: 16 }}>
           <div className="card">
             <h3 style={{ marginTop: 0 }}>Nutritional Information</h3>
@@ -66,7 +76,23 @@ export default function RecipePage() {
               {recipe.proteinsG ? <div>Protein: {recipe.proteinsG} g</div> : null}
               {recipe.carbohydratesG ? <div>Carbs: {recipe.carbohydratesG} g</div> : null}
               {recipe.fatsG ? <div>Fats: {recipe.fatsG} g</div> : null}
-              {dietNames ? <div>Diets: {dietNames}</div> : null}
+              {diets.length > 0 ? (
+                <div>
+                  <div className="recipe-ingredients-title">Diets</div>
+                  <div className="diet-tag-list">
+                    {diets.map((diet) => (
+                      <button
+                        key={diet.dietId || diet.id || diet.name}
+                        type="button"
+                        className="diet-tag-btn"
+                        onClick={() => handleDietClick(diet.name)}
+                      >
+                        {diet.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
             </div>
           </div>
 
@@ -113,22 +139,6 @@ export default function RecipePage() {
             <button type="button" className="primary-btn" onClick={handleCook}>
               Cook recipe
             </button>
-          </div>
-        </div>
-
-        {/* Coloana Dreaptă: Instrucțiuni de preparare */}
-        <div className="grid" style={{ gap: 16 }}>
-          <div className="card">
-            <h3 style={{ marginTop: 0 }}>Preparation Instructions</h3>
-            {recipe.description ? (
-              <p style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: "1.6" }}>
-                {recipe.description}
-              </p>
-            ) : (
-              <p style={{ margin: 0, color: "#6b7280" }}>
-                No specific instructions provided for this recipe.
-              </p>
-            )}
           </div>
         </div>
       </div>

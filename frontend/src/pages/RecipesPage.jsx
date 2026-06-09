@@ -15,7 +15,7 @@ export default function RecipesPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [view, setView] = useState("available");
-  const [dietFilter, setDietFilter] = useState("");
+  const [dietFilters, setDietFilters] = useState([]);
   const [recipes, setRecipes] = useState([]);
   const [detailsMap, setDetailsMap] = useState({});
   const [status, setStatus] = useState({ type: "", message: "" });
@@ -25,6 +25,11 @@ export default function RecipesPage() {
   useEffect(() => {
     if (location.state?.status) {
       setStatus(location.state.status);
+    }
+    if (Array.isArray(location.state?.dietFilters)) {
+      setDietFilters(location.state.dietFilters);
+    }
+    if (location.state?.status || location.state?.dietFilters) {
       window.history.replaceState({}, document.title);
     }
   }, [location.state]);
@@ -83,10 +88,10 @@ export default function RecipesPage() {
 
   const filtered = useMemo(() => {
     let result = normalizedRecipes;
-    if (dietFilter) {
+    if (dietFilters.length > 0) {
       result = result.filter(({ recipe }) => {
-        const diets = recipe?.dietClassifications || [];
-        return diets.some((diet) => diet.name?.toLowerCase() === dietFilter.toLowerCase());
+        const dietNames = (recipe?.dietClassifications || []).map((diet) => diet.name?.toLowerCase());
+        return dietFilters.every((dietFilter) => dietNames.includes(dietFilter.toLowerCase()));
       });
     }
     if (recipeSearch) {
@@ -95,10 +100,15 @@ export default function RecipesPage() {
       );
     }
     return result;
-  }, [dietFilter, recipeSearch, normalizedRecipes]);
+  }, [dietFilters, recipeSearch, normalizedRecipes]);
 
   const handleCook = (recipeId) => {
     navigate(`/recipe/${recipeId}`);
+  };
+
+  const handleDietClick = (dietName) => {
+    setDietFilters([dietName]);
+    navigate("/", { replace: true });
   };
 
   return (
@@ -146,13 +156,14 @@ export default function RecipesPage() {
               match={match}
               details={detailsMap[recipe.recipeId]}
               onCook={() => handleCook(recipe.recipeId)}
+              onDietClick={handleDietClick}
             />
           ))}
         </div>
       </div>
 
       <div className="grid" style={{ gap: 16 }}>
-        <DietFilter value={dietFilter} onChange={setDietFilter} />
+        <DietFilter value={dietFilters} onChange={setDietFilters} />
       </div>
     </div>
   );

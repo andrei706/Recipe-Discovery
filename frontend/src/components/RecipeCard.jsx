@@ -1,9 +1,9 @@
-export default function RecipeCard({ recipe, match, details, onCook }) {
+export default function RecipeCard({ recipe, match, details, onCook, onDietClick }) {
   if (!recipe) {
     return null;
   }
 
-  const dietNames = recipe.dietClassifications?.map((diet) => diet.name).join(", ");
+  const diets = recipe.dietClassifications || [];
   const ingredients = details?.ingredients || [];
   const haveList = ingredients.filter((item) => item.missingQuantity === 0);
   const missingList = ingredients.filter((item) => item.missingQuantity > 0);
@@ -23,7 +23,23 @@ export default function RecipeCard({ recipe, match, details, onCook }) {
             Matched {match.matchedIngredients} / {match.totalIngredients}
           </div>
         ) : null}
-        {dietNames ? <div>Diets: {dietNames}</div> : null}
+        {diets.length > 0 ? (
+          <div>
+            <div className="recipe-ingredients-title">Diets</div>
+            <div className="diet-tag-list">
+              {diets.map((diet) => (
+                <button
+                  key={diet.dietId || diet.id || diet.name}
+                  type="button"
+                  className="diet-tag-btn"
+                  onClick={() => onDietClick?.(diet.name)}
+                >
+                  {diet.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         {ingredients.length > 0 ? (
           <div className="recipe-ingredients">

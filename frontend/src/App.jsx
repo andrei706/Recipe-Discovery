@@ -4,6 +4,7 @@ import LoginPage from "./pages/LoginPage.jsx";
 import SignupPage from "./pages/SignupPage.jsx";
 import RecipesPage from "./pages/RecipesPage.jsx";
 import RecipePage from "./pages/RecipePage.jsx";
+import RecipeInstructionsPage from "./pages/RecipeInstructionsPage.jsx";
 import InventoryPage from "./pages/InventoryPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import AIChefPage from "./pages/AIChefPage.jsx";
@@ -21,6 +22,7 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<RecipesPage />} />
             <Route path="/recipe/:recipeId" element={<RecipePage />} />
+            <Route path="/recipe/:recipeId/instructions" element={<RecipeInstructionsPage />} />
             <Route path="/inventory" element={<InventoryPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/ai-chef" element={<AIChefPage />} />
