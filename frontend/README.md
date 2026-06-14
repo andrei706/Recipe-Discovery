@@ -4,7 +4,7 @@ React + Vite frontend that consumes the existing Spring Boot API.
 
 ## Setup
 
-- Backend is expected at `http://localhost:8080` by default.
+- Backend is expected at `http://localhost:8081` by default.
 - Override with `VITE_API_BASE_URL` if needed.
 
 ## Run (dev)
@@ -27,7 +27,7 @@ Requires a valid JWT token. Set `AUTH_TOKEN` and optionally `API_BASE_URL`.
 
 ```powershell
 $env:AUTH_TOKEN="<paste token>"
-$env:API_BASE_URL="http://localhost:8080"
+$env:API_BASE_URL="http://localhost:8081"
 npm run smoke
 ```
 

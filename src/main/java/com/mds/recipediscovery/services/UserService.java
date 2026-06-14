@@ -54,6 +54,10 @@ public class UserService {
         String username = request.getUsername().trim();
         String email = request.getEmail().trim();
 
+        if (!username.matches("^[a-zA-Z0-9_]+$")) {
+            throw new IllegalArgumentException("Username can only contain letters, numbers, and underscores (_), without spaces.");
+        }
+
         if (username.length() > 50) {
             throw new IllegalArgumentException("Username must be at most 50 characters long");
         }
@@ -66,11 +70,11 @@ public class UserService {
             throw new IllegalArgumentException("Password must be at least 8 characters long");
         }
 
-        if (userRepository.findByUsername(username).isPresent()) {
+        if (userRepository.findByUsernameIgnoreCase(username).isPresent()) {
             throw new IllegalArgumentException("Username already in use");
         }
 
-        if (userRepository.findByEmail(email).isPresent()) {
+        if (userRepository.findByEmailIgnoreCase(email).isPresent()) {
             throw new IllegalArgumentException("Email already in use");
         }
 
@@ -120,9 +124,9 @@ public class UserService {
         String normalizedType = loginType.trim().toUpperCase();
 
         return switch (normalizedType) {
-            case "USERNAME" -> userRepository.findByUsername(identifier)
+            case "USERNAME" -> userRepository.findByUsernameIgnoreCase(identifier)
                     .orElseThrow(() -> new SecurityException("Invalid credentials"));
-            case "EMAIL" -> userRepository.findByEmail(identifier)
+            case "EMAIL" -> userRepository.findByEmailIgnoreCase(identifier)
                     .orElseThrow(() -> new SecurityException("Invalid credentials"));
             default -> throw new IllegalArgumentException("loginType must be USERNAME or EMAIL");
         };

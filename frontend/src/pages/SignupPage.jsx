@@ -21,6 +21,12 @@ export default function SignupPage() {
     event.preventDefault();
     setError("");
 
+    const usernameRegex = /^[a-zA-Z0-9_]+$/;
+    if (!usernameRegex.test(username)) {
+      setError("Username can only contain letters, numbers, and underscores (_), without spaces.");
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
@@ -56,8 +62,15 @@ export default function SignupPage() {
           type="text"
           placeholder="Username"
           value={username}
-          onChange={(event) => setUsername(event.target.value)}
+          onChange={(event) => {
+            setUsername(event.target.value);
+            event.target.setCustomValidity("");
+          }}
+          onInvalid={(event) => {
+            event.target.setCustomValidity("You can only use letters, numbers, and underscores.");
+          }}
           maxLength={50}
+          pattern="^[a-zA-Z0-9_]+$"
           required
         />
         <input
