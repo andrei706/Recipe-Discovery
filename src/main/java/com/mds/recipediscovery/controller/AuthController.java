@@ -6,7 +6,10 @@ import com.mds.recipediscovery.dto.LoginResponseDTO;
 import com.mds.recipediscovery.dto.LogoutResponseDTO;
 import com.mds.recipediscovery.dto.SignupRequestDTO;
 import com.mds.recipediscovery.dto.SignupResponseDTO;
+import org.springframework.web.util.HtmlUtils;
 import com.mds.recipediscovery.services.UserService;
+import com.mds.recipediscovery.security.JwtService;
+import com.mds.recipediscovery.models.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -23,9 +26,11 @@ import org.springframework.web.server.ResponseStatusException;
 public class AuthController {
 
     private final UserService userService;
+    private final JwtService jwtService;
 
-    public AuthController(UserService userService) {
+    public AuthController(UserService userService, JwtService jwtService) {
         this.userService = userService;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/login")
@@ -42,7 +47,15 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<SignupResponseDTO> signup(@RequestBody SignupRequestDTO request) {
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(userService.signup(request));
+            SignupResponseDTO response = userService.signup(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new SignupResponseDTO(
+                    response.getToken(),
+                    response.getTokenType(),
+                    response.getExpiresInMs(),
+                    response.getUserId(),
+                    HtmlUtils.htmlEscape(response.getUsername()),
+                    HtmlUtils.htmlEscape(response.getEmail())
+            ));
         } catch (IllegalArgumentException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
@@ -67,6 +80,28 @@ public class AuthController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
         } catch (IllegalArgumentException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        } catch (SecurityException ex) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+        }
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponseDTO> refresh(Authentication authentication) {
+        try {
+            if (authentication == null || authentication.getName() == null) {
+                throw new SecurityException("User not authenticated");
+            }
+            Integer userId = Integer.valueOf(authentication.getName());
+            User user = userService.getUserById(userId);
+            String token = jwtService.generateToken(user);
+            return ResponseEntity.ok(new LoginResponseDTO(
+                    token, "Bearer", jwtService.getJwtExpirationMs(),
+                    user.getUserId(), user.getUsername(), user.getEmail()
+            ));
+        } catch (NumberFormatException ex) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
         } catch (SecurityException ex) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
         } catch (RuntimeException ex) {
