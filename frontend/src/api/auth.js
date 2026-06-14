@@ -29,3 +29,10 @@ export function changePassword(token, { currentPassword, newPassword }) {
   });
 }
 
+export function refresh(token) {
+  return apiRequest("/api/auth/refresh", {
+    method: "POST",
+    token
+  });
+}
+
