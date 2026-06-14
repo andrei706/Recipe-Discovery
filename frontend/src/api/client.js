@@ -20,8 +20,12 @@ export async function apiRequest(path, { method = "GET", token, body, params } =
     body: body ? JSON.stringify(body) : undefined
   });
 
+  if (response.status === 401 && typeof window !== "undefined") {
+    window.dispatchEvent(new Event("auth-expired"));
+  }
+
   const contentType = response.headers.get("content-type") || "";
-  let payload = null;
+  let payload;
   if (contentType.includes("application/json")) {
     payload = await response.json();
   } else {
@@ -36,6 +40,9 @@ export async function apiRequest(path, { method = "GET", token, body, params } =
       message = payload.message;
     } else if (payload?.error) {
       message = payload.error;
+    }
+    if (response.status === 401) {
+      message = "Unauthorized";
     }
     throw new Error(message);
   }
