@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState, useEffect, useRef } from "react";
+import { createContext, useContext, useMemo, useState, useEffect, useRef, useCallback } from "react";
 import { refresh as refreshTokenApi } from "../api/auth.js";
 
 const STORAGE_KEY = "rd_auth";
@@ -20,7 +20,7 @@ function readStoredAuth() {
 export function AuthProvider({ children }) {
   const [auth, setAuth] = useState(readStoredAuth());
 
-  const saveAuth = (nextAuth) => {
+  const saveAuth = useCallback((nextAuth) => {
     // augment stored auth with a tokenObtainedAt timestamp if not present
     let toStore = nextAuth;
     if (nextAuth) {
@@ -31,7 +31,9 @@ export function AuthProvider({ children }) {
       localStorage.removeItem(STORAGE_KEY);
     }
     setAuth(toStore);
-  };
+  }, []);
+
+  const clearAuth = useCallback(() => saveAuth(null), [saveAuth]);
 
   const value = useMemo(
     () => ({
@@ -39,9 +41,9 @@ export function AuthProvider({ children }) {
       token: auth?.token || null,
       user: auth?.user || null,
       saveAuth,
-      clearAuth: () => saveAuth(null)
+      clearAuth
     }),
-    [auth]
+    [auth, saveAuth, clearAuth]
   );
 
   // Background token refresh: track user activity and refresh token silently when needed
@@ -68,6 +70,18 @@ export function AuthProvider({ children }) {
       window.removeEventListener("keydown", recordActivity);
     };
   }, []);
+
+  useEffect(() => {
+    const handleAuthExpired = () => {
+      clearAuth();
+    };
+
+    window.addEventListener("auth-expired", handleAuthExpired);
+
+    return () => {
+      window.removeEventListener("auth-expired", handleAuthExpired);
+    };
+  }, [clearAuth]);
 
   useEffect(() => {
     if (!auth || !auth.token || !auth.expiresInMs) {
@@ -123,7 +137,7 @@ export function AuthProvider({ children }) {
       cancelled = true;
       clearInterval(intervalId);
     };
-  }, [auth]);
+  }, [auth, saveAuth]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
