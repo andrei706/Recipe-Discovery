@@ -194,7 +194,7 @@ public class AiService {
 
         String inventoryStr = chatToolsService.inventorySnapshot(userId);
         List<RecipeMatchDTO> topSubset = chatToolsService.topRecipesForPrompt(userId, userPrompt, 5);
-        String recipesContext = chatToolsService.recipeContext(topSubset);
+        String recipesContext = chatToolsService.recipeContext(userId, topSubset);
 
         String systemPrompt = "You are an intelligent kitchen assistant orchestrated with backend tools (inventory tool, recipe-search tool, and nutrition context tool):\n" +
                 "Your role is to suggest database recipes based on user queries and available ingredients.\n\n" +
@@ -206,7 +206,7 @@ public class AiService {
                 (recipesContext.isEmpty() ? "(No matching recipes found in database)" : recipesContext) + "\n" +
                 "Instructions:\n" +
                 "1. Read the user's prompt carefully.\n" +
-                "2. Recommend recipes EXCLUSIVELY from the list of relevant options above. Explain why they fit the user request and user inventory. Do not invent new recipes that are not in the list. Refer to the recommended recipes ONLY by their Names. Do NOT specify, mention, or write the recipe IDs in your conversational reply (`agent1Response`). Write a friendly, helpful conversational reply detailing these choices. Keep it in English or Romanian, matching the user's language query. If the user writes in Romanian, reply in Romanian.\n" +
+                "2. Recommend recipes EXCLUSIVELY from the list of relevant options above. Explain why they fit the user request and user inventory. Do not invent new recipes that are not in the list. Refer to the recommended recipes ONLY by their Names. Do NOT specify, mention, or write the recipe IDs in your conversational reply (`agent1Response`). Do NOT use any markdown formatting in your conversational reply (`agent1Response`), especially bold formatting (avoid wrapping recipe names or any words in asterisks like **Recipe Name** or *Recipe Name*). Write only plain text. Write a friendly, helpful conversational reply detailing these choices. Keep it in English or Romanian, matching the user's language query. If the user writes in Romanian, reply in Romanian. IMPORTANT: If a recipe has missing or insufficient ingredients (indicated with '[Insufficient...]' or '[Missing...]' in the list of relevant options above), you MUST still recommend the recipe, but you MUST explicitly mention to the user that they do not have enough of those ingredients, stating what they currently have in inventory vs. what is required.\n" +
                 "3. You MUST respond with ONLY a valid JSON object. Do not include any explanation outside the JSON. The JSON structure MUST be exactly:\n" +
                 "{\n" +
                 "  \"agent1Response\": \"Conversational chat response recommending recipes EXCLUSIVELY from the database list...\",\n" +
@@ -228,7 +228,11 @@ public class AiService {
             JsonNode jsonNode = relaxedMapper.readTree(normalizedResponse);
             Map<String, Object> resultMap = new HashMap<>();
 
-            resultMap.put("agent1Response", jsonNode.path("agent1Response").asText(""));
+            String agent1Response = jsonNode.path("agent1Response").asText("");
+            if (agent1Response != null) {
+                agent1Response = agent1Response.replace("**", "");
+            }
+            resultMap.put("agent1Response", agent1Response);
             resultMap.put("recommendedRecipeIds", relaxedMapper.convertValue(
                     jsonNode.path("recommendedRecipeIds"), List.class));
 
@@ -238,6 +242,8 @@ public class AiService {
             try {
                 Map<String, Object> resultMap = parseMalformedJson(normalizedResponse);
                 if (resultMap.get("agent1Response") != null && !resultMap.get("agent1Response").toString().isEmpty()) {
+                    String agent1 = resultMap.get("agent1Response").toString().replace("**", "");
+                    resultMap.put("agent1Response", agent1);
                     return resultMap;
                 }
             } catch (Exception ex) {
@@ -246,7 +252,8 @@ public class AiService {
 
             // Revert to displaying text if all parsers failed
             Map<String, Object> fallbackMap = new HashMap<>();
-            fallbackMap.put("agent1Response", rawLlmResponse);
+            String fallbackResponse = rawLlmResponse != null ? rawLlmResponse.replace("**", "") : "";
+            fallbackMap.put("agent1Response", fallbackResponse);
             fallbackMap.put("recommendedRecipeIds", List.of());
             return fallbackMap;
         }
@@ -365,6 +372,28 @@ public class AiService {
         if (text.endsWith("```")) {
             text = text.substring(0, text.length() - 3);
         }
-        return text.trim();
+        text = text.trim();
+
+        int firstBrace = text.indexOf('{');
+        int firstBracket = text.indexOf('[');
+
+        int start = -1;
+        char endChar = ' ';
+        if (firstBrace != -1 && (firstBracket == -1 || firstBrace < firstBracket)) {
+            start = firstBrace;
+            endChar = '}';
+        } else if (firstBracket != -1) {
+            start = firstBracket;
+            endChar = ']';
+        }
+
+        if (start != -1) {
+            int lastEnd = text.lastIndexOf(endChar);
+            if (lastEnd > start) {
+                return text.substring(start, lastEnd + 1).trim();
+            }
+        }
+
+        return text;
     }
 }

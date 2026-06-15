@@ -17,7 +17,7 @@ public class RecipeNecessities {
     private Ingredient ingredient;
 
     @Column(nullable = false)
-    private int quantity;
+    private double quantity;
 
     public RecipeNecessities() {}
 
@@ -25,6 +25,6 @@ public class RecipeNecessities {
     public void setRecipe(Recipe recipe) { this.recipe = recipe; }
     public Ingredient getIngredient() { return ingredient; }
     public void setIngredient(Ingredient ingredient) { this.ingredient = ingredient; }
-    public int getQuantity() { return quantity; }
-    public void setQuantity(int quantity) { this.quantity = quantity; }
+    public double getQuantity() { return quantity; }
+    public void setQuantity(double quantity) { this.quantity = quantity; }
 }

@@ -91,7 +91,7 @@ public class RecipeService {
 
         for (RecipeNecessities req : requirements) {
             Inventory inventory = userInventoryMap.get(req.getIngredient().getIngredientId());
-            int newQuantity = inventory.getQuantity() - req.getQuantity();
+            double newQuantity = inventory.getQuantity() - req.getQuantity();
 
             if (newQuantity <= 0) {
                 inventoryRepository.delete(inventory);
@@ -130,11 +130,11 @@ public class RecipeService {
 
         for (RecipeNecessities requirement : requirements) {
             Ingredient ingredient = requirement.getIngredient();
-            int requiredQuantity = requirement.getQuantity();
-            int availableQuantity = inventoryMap.containsKey(ingredient.getIngredientId())
+            double requiredQuantity = requirement.getQuantity();
+            double availableQuantity = inventoryMap.containsKey(ingredient.getIngredientId())
                     ? inventoryMap.get(ingredient.getIngredientId()).getQuantity()
                     : 0;
-            int missingQuantity = Math.max(0, requiredQuantity - availableQuantity);
+            double missingQuantity = Math.max(0, requiredQuantity - availableQuantity);
             if (missingQuantity == 0) {
                 matchedCount += 1;
             }
@@ -183,11 +183,11 @@ public class RecipeService {
 
                     for (RecipeNecessities requirement : requirements) {
                         Ingredient ingredient = requirement.getIngredient();
-                        int requiredQuantity = requirement.getQuantity();
-                        int availableQuantity = inventoryMap.containsKey(ingredient.getIngredientId())
+                        double requiredQuantity = requirement.getQuantity();
+                        double availableQuantity = inventoryMap.containsKey(ingredient.getIngredientId())
                                 ? inventoryMap.get(ingredient.getIngredientId()).getQuantity()
                                 : 0;
-                        int missingQuantity = Math.max(0, requiredQuantity - availableQuantity);
+                        double missingQuantity = Math.max(0, requiredQuantity - availableQuantity);
                         if (missingQuantity == 0) {
                             matchedCount += 1;
                         }

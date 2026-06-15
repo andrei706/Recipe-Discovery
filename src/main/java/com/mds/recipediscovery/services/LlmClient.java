@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -41,6 +42,9 @@ public class LlmClient {
     @Value("${langchain4j.ollama.model-name:llama3}")
     private String ollamaModelName;
 
+    @Value("${langchain4j.ollama.timeout-seconds:300}")
+    private int ollamaTimeoutSeconds;
+
     private ChatModel geminiModel;
     private ChatModel ollamaModel;
 
@@ -66,6 +70,7 @@ public class LlmClient {
             ollamaModel = OllamaChatModel.builder()
                     .baseUrl(ollamaBaseUrl)
                     .modelName(ollamaModelName)
+                    .timeout(Duration.ofSeconds(ollamaTimeoutSeconds))
                     .build();
         }
         return ollamaModel;
@@ -157,7 +162,7 @@ public class LlmClient {
         for (int i = 0; i < count; i++) {
             if (i > 0)
                 recNames.append(", ");
-            recNames.append("**").append(names.get(i)).append("**");
+            recNames.append(names.get(i));
             recIds.add(ids.get(i));
         }
 

@@ -44,6 +44,12 @@ function dateRange(startDate, endDate) {
 function dayLabel(dateStr) {
   return new Date(dateStr).toLocaleDateString("en-GB", { weekday: "short", day: "2-digit", month: "short" });
 }
+const formatQty = (val) => {
+  if (val === null || val === undefined) return "";
+  const num = Number(val);
+  if (Number.isNaN(num)) return val;
+  return parseFloat(num.toFixed(2));
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -275,19 +281,19 @@ export default function PlannerPage() {
     setAddingInventory(true);
     const errors = [];
     for (const row of missing) {
-      const deficit = row.totalQty - row.availableQty;
+      const deficit = formatQty(row.totalQty - row.availableQty);
       try {
         if (row.availableQty === 0) {
           // Not in inventory yet — add it
           await addIngredient(token, { ingredientId: row.ingredientId, quantity: deficit });
         } else {
           // Already in inventory — top it up to the required total
-          await updateIngredient(token, { ingredientId: row.ingredientId, newQuantity: row.availableQty + deficit });
+          await updateIngredient(token, { ingredientId: row.ingredientId, newQuantity: formatQty(row.availableQty + deficit) });
         }
       } catch (e) {
         // If add failed because already exists, try update instead
         try {
-          await updateIngredient(token, { ingredientId: row.ingredientId, newQuantity: row.availableQty + deficit });
+          await updateIngredient(token, { ingredientId: row.ingredientId, newQuantity: formatQty(row.availableQty + deficit) });
         } catch {
           errors.push(row.name);
         }
@@ -755,10 +761,10 @@ export default function PlannerPage() {
                         return (
                           <tr key={row.name}>
                             <td>{row.name}</td>
-                            <td className="planner-ing-qty">{row.totalQty}</td>
+                            <td className="planner-ing-qty">{formatQty(row.totalQty)}</td>
                             <td>
                               <span className={`planner-ing-have ${enough ? "ok" : partial ? "partial" : "none"}`}>
-                                {row.availableQty}
+                                {formatQty(row.availableQty)}
                               </span>
                             </td>
                             <td className="planner-ing-unit">{row.unit}</td>

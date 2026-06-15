@@ -127,7 +127,7 @@ class RecipeServiceTest {
 
         recipeService.cookRecipe(1, 1);
 
-        assertEquals(300, invFlour.getQuantity());
+        assertEquals(300.0, invFlour.getQuantity(), 0.001);
         org.mockito.Mockito.verify(inventoryRepository, org.mockito.Mockito.times(1)).save(invFlour);
         org.mockito.Mockito.verify(inventoryRepository, org.mockito.Mockito.times(1)).delete(invEggs);
     }

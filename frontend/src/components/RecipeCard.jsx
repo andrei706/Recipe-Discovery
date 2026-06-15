@@ -1,3 +1,10 @@
+const formatQty = (val) => {
+  if (val === null || val === undefined) return "";
+  const num = Number(val);
+  if (Number.isNaN(num)) return val;
+  return parseFloat(num.toFixed(2));
+};
+
 export default function RecipeCard({ recipe, match, details, onCook, onDietClick }) {
   if (!recipe) {
     return null;
@@ -51,7 +58,7 @@ export default function RecipeCard({ recipe, match, details, onCook, onDietClick
                 <ul>
                   {haveList.map((item) => (
                     <li key={item.ingredientId}>
-                      {item.ingredientName}: {item.requiredQuantity} {item.measurementUnit} (you have {item.availableQuantity})
+                      {item.ingredientName}: {formatQty(item.requiredQuantity)} {item.measurementUnit} (you have {formatQty(item.availableQuantity)})
                     </li>
                   ))}
                 </ul>
@@ -65,7 +72,7 @@ export default function RecipeCard({ recipe, match, details, onCook, onDietClick
                 <ul>
                   {missingList.map((item) => (
                     <li key={item.ingredientId}>
-                      {item.ingredientName}: need {item.requiredQuantity} {item.measurementUnit}, missing {item.missingQuantity}
+                      {item.ingredientName}: need {formatQty(item.requiredQuantity)} {item.measurementUnit}, missing {formatQty(item.missingQuantity)}
                     </li>
                   ))}
                 </ul>

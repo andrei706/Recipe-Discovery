@@ -27,7 +27,7 @@ public class InventoryController {
     public ResponseEntity<?> addIngredient(
             Authentication authentication,
             @RequestParam Integer ingredientId,
-            @RequestParam int quantity) {
+            @RequestParam double quantity) {
         try {
             Inventory inventory = inventoryService.addIngredientToUser(getCurrentUserId(authentication), ingredientId, quantity);
             return ResponseEntity.ok(inventory);
@@ -40,7 +40,7 @@ public class InventoryController {
     public ResponseEntity<?> updateIngredientQuantity(
             Authentication authentication,
             @RequestParam Integer ingredientId,
-            @RequestParam int newQuantity) {
+            @RequestParam double newQuantity) {
         try {
             Inventory inventory = inventoryService.updateIngredientQuantity(getCurrentUserId(authentication), ingredientId, newQuantity);
             if (inventory == null) {

@@ -44,7 +44,7 @@ class InventoryServiceTest {
         testIngredient = new Ingredient();
         testIngredient.setIngredientId(1);
 
-        existingInventory = new Inventory(testUser, testIngredient, 500);
+        existingInventory = new Inventory(testUser, testIngredient, 500.0);
     }
 
     @Test
@@ -56,7 +56,7 @@ class InventoryServiceTest {
 
         Inventory result = inventoryService.addIngredientToUser(1, 1, 200);
 
-        assertEquals(200, result.getQuantity());
+        assertEquals(200.0, result.getQuantity(), 0.001);
         verify(inventoryRepository, times(1)).save(any(Inventory.class));
     }
 
@@ -70,7 +70,7 @@ class InventoryServiceTest {
 
         Inventory result = inventoryService.addIngredientToUser(1, 1, 200);
 
-        assertEquals(700, result.getQuantity());
+        assertEquals(700.0, result.getQuantity(), 0.001);
         verify(inventoryRepository, times(1)).save(existingInventory);
     }
 
@@ -84,7 +84,7 @@ class InventoryServiceTest {
 
         Inventory result = inventoryService.updateIngredientQuantity(1, 1, 300);
 
-        assertEquals(300, result.getQuantity());
+        assertEquals(300.0, result.getQuantity(), 0.001);
         verify(inventoryRepository, times(1)).save(existingInventory);
     }
 

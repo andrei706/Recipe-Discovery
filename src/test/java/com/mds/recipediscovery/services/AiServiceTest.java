@@ -148,6 +148,56 @@ class AiServiceTest {
         assertEquals(5, a3.get("recipeId"));
     }
 
+    @Test
+    void testGetChatResponse_StripsAsterisks() {
+        com.mds.recipediscovery.models.User mockUser = new com.mds.recipediscovery.models.User();
+        mockUser.setUsername("Andrei");
+        when(chatToolsService.findUserOrThrow(1)).thenReturn(mockUser);
+        when(chatToolsService.inventorySnapshot(1)).thenReturn("Spinach");
+        when(chatToolsService.topRecipesForPrompt(eq(1), anyString(), eq(5))).thenReturn(List.of());
+        when(chatToolsService.recipeContext(eq(1), anyList())).thenReturn("Some context");
+
+        String mockLlmResponse = "{\n" +
+                "  \"agent1Response\": \"I suggest cooking **Chia Pudding** and **Tofu with Spinach**!\",\n" +
+                "  \"recommendedRecipeIds\": [5, 12]\n" +
+                "}";
+        llmClient.setResponse(mockLlmResponse);
+
+        Map<String, Object> response = aiService.getChatResponse(1, "What should I eat?");
+
+        assertNotNull(response);
+        assertEquals("I suggest cooking Chia Pudding and Tofu with Spinach!", response.get("agent1Response"));
+        assertEquals(List.of(5, 12), response.get("recommendedRecipeIds"));
+    }
+
+    @Test
+    void testGenerateMealPlan_ConversationalPrefix() {
+        Recipe recipe1 = new Recipe();
+        recipe1.setRecipeId(5);
+        recipe1.setName("Tofu with Spinach");
+        recipe1.setCaloriesKcal(280.0f);
+        recipe1.setTotalPrepTimeMinutes(25);
+
+        when(recipeRepository.findAll()).thenReturn(List.of(recipe1));
+        when(chatToolsService.inventorySnapshot(1)).thenReturn("");
+
+        String mockLlmResponse = "Here is the meal plan you requested:\n" +
+                "```json\n" +
+                "[{\"dayNumber\":1,\"mealType\":\"breakfast\",\"recipeId\":5}]\n" +
+                "```\n" +
+                "Hope you like it!";
+        llmClient.setResponse(mockLlmResponse);
+
+        List<Map<String, Object>> result = aiService.generateMealPlan(1, "Plan breakfast on day 1", 1);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        Map<String, Object> entry = result.get(0);
+        assertEquals(1, entry.get("dayNumber"));
+        assertEquals("breakfast", entry.get("mealType"));
+        assertEquals(5, entry.get("recipeId"));
+    }
+
     private static class FakeLlmClient extends LlmClient {
         private String response;
 

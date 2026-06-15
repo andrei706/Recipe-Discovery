@@ -4,22 +4,22 @@ public class RecipeIngredientStatusDTO {
     private Integer ingredientId;
     private String ingredientName;
     private String measurementUnit;
-    private int requiredQuantity;
-    private int availableQuantity;
-    private int missingQuantity;
+    private double requiredQuantity;
+    private double availableQuantity;
+    private double missingQuantity;
 
     public RecipeIngredientStatusDTO(Integer ingredientId,
                                      String ingredientName,
                                      String measurementUnit,
-                                     int requiredQuantity,
-                                     int availableQuantity,
-                                     int missingQuantity) {
+                                     double requiredQuantity,
+                                     double availableQuantity,
+                                     double missingQuantity) {
         this.ingredientId = ingredientId;
         this.ingredientName = ingredientName;
         this.measurementUnit = measurementUnit;
-        this.requiredQuantity = requiredQuantity;
-        this.availableQuantity = availableQuantity;
-        this.missingQuantity = missingQuantity;
+        this.requiredQuantity = Math.round(requiredQuantity * 100.0) / 100.0;
+        this.availableQuantity = Math.round(availableQuantity * 100.0) / 100.0;
+        this.missingQuantity = Math.round(missingQuantity * 100.0) / 100.0;
     }
 
     public Integer getIngredientId() {
@@ -34,15 +34,15 @@ public class RecipeIngredientStatusDTO {
         return measurementUnit;
     }
 
-    public int getRequiredQuantity() {
+    public double getRequiredQuantity() {
         return requiredQuantity;
     }
 
-    public int getAvailableQuantity() {
+    public double getAvailableQuantity() {
         return availableQuantity;
     }
 
-    public int getMissingQuantity() {
+    public double getMissingQuantity() {
         return missingQuantity;
     }
 }

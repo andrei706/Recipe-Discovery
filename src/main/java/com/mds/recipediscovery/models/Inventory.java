@@ -17,11 +17,11 @@ public class Inventory {
     private Ingredient ingredient;
 
     @Column(nullable = false)
-    private int quantity;
+    private double quantity;
 
     public Inventory() {}
 
-    public Inventory(User user, Ingredient ingredient, int quantity) {
+    public Inventory(User user, Ingredient ingredient, double quantity) {
         this.user = user;
         this.ingredient = ingredient;
         this.quantity = quantity;
@@ -31,6 +31,6 @@ public class Inventory {
     public void setUser(User user) { this.user = user; }
     public Ingredient getIngredient() { return ingredient; }
     public void setIngredient(Ingredient ingredient) { this.ingredient = ingredient; }
-    public int getQuantity() { return quantity; }
-    public void setQuantity(int quantity) { this.quantity = quantity; }
+    public double getQuantity() { return quantity; }
+    public void setQuantity(double quantity) { this.quantity = quantity; }
 }

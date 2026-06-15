@@ -3,6 +3,13 @@ import { addIngredient, getInventory, removeIngredient, updateIngredient } from 
 import { getIngredients } from "../api/ingredients.js";
 import { useAuth } from "../context/AuthContext.jsx";
 
+const formatQty = (val) => {
+  if (val === null || val === undefined) return "";
+  const num = Number(val);
+  if (Number.isNaN(num)) return val;
+  return parseFloat(num.toFixed(2));
+};
+
 export default function InventoryPage() {
   const { token } = useAuth();
   const [status, setStatus] = useState({ type: "", message: "" });
@@ -51,7 +58,7 @@ export default function InventoryPage() {
       setInventory(list);
       setEditValues(
         list.reduce((acc, item) => {
-          acc[item.ingredientId] = String(item.quantity);
+          acc[item.ingredientId] = String(formatQty(item.quantity));
           return acc;
         }, {})
       );
@@ -185,7 +192,7 @@ export default function InventoryPage() {
               <input
                 type="number"
                 min="0"
-                step="1"
+                step="0.01"
                 value={editValues[item.ingredientId] ?? ""}
                 onFocus={() => setFocusedId(item.ingredientId)}
                 onChange={(event) =>
@@ -273,8 +280,8 @@ export default function InventoryPage() {
               </div>
               <input
                 type="number"
-                min="1"
-                step="1"
+                min="0.01"
+                step="0.01"
                 placeholder="Quantity"
                 value={form.quantity}
                 onChange={(event) => setForm((prev) => ({ ...prev, quantity: event.target.value }))}

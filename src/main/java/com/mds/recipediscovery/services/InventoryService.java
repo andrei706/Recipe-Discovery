@@ -27,7 +27,7 @@ public class InventoryService {
         this.ingredientRepository = ingredientRepository;
     }
 
-    public Inventory addIngredientToUser(Integer userId, Integer ingredientId, int quantity) {
+    public Inventory addIngredientToUser(Integer userId, Integer ingredientId, double quantity) {
         if (quantity <= 0) {
             throw new IllegalArgumentException("Quantity must be greater than 0");
         }
@@ -50,7 +50,7 @@ public class InventoryService {
         }
     }
 
-    public Inventory updateIngredientQuantity(Integer userId, Integer ingredientId, int newQuantity) {
+    public Inventory updateIngredientQuantity(Integer userId, Integer ingredientId, double newQuantity) {
         if (newQuantity < 0) {
             throw new IllegalArgumentException("Quantity cannot be negative");
         }
