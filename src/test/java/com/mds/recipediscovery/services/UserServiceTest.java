@@ -60,7 +60,7 @@ class UserServiceTest {
         request.setIdentifier("Andrei");
         request.setPassword("passAndrei1");
 
-        when(userRepository.findByUsername("Andrei")).thenReturn(Optional.of(user));
+        when(userRepository.findByUsernameIgnoreCase("Andrei")).thenReturn(Optional.of(user));
 
         LoginResponseDTO response = userService.login(request);
 
@@ -83,7 +83,7 @@ class UserServiceTest {
         request.setIdentifier("Andrei");
         request.setPassword("passAndrei1");
 
-        when(userRepository.findByUsername("Andrei")).thenReturn(Optional.of(user));
+        when(userRepository.findByUsernameIgnoreCase("Andrei")).thenReturn(Optional.of(user));
 
         assertThrows(SecurityException.class, () -> userService.login(request));
         verify(userRepository, never()).save(any(User.class));
@@ -102,7 +102,7 @@ class UserServiceTest {
         request.setIdentifier("elena@email.com");
         request.setPassword("wrongPassword");
 
-        when(userRepository.findByEmail("elena@email.com")).thenReturn(Optional.of(user));
+        when(userRepository.findByEmailIgnoreCase("elena@email.com")).thenReturn(Optional.of(user));
 
         assertThrows(SecurityException.class, () -> userService.login(request));
     }
@@ -114,8 +114,8 @@ class UserServiceTest {
         request.setEmail("maria@email.com");
         request.setPassword("mariaPass123");
 
-        when(userRepository.findByUsername("Maria")).thenReturn(Optional.empty());
-        when(userRepository.findByEmail("maria@email.com")).thenReturn(Optional.empty());
+        when(userRepository.findByUsernameIgnoreCase("Maria")).thenReturn(Optional.empty());
+        when(userRepository.findByEmailIgnoreCase("maria@email.com")).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
             User user = invocation.getArgument(0);
             user.setUserId(10);
@@ -140,7 +140,7 @@ class UserServiceTest {
         request.setPassword("andreiPass123");
 
         User existingUser = new User();
-        when(userRepository.findByUsername("Andrei")).thenReturn(Optional.of(existingUser));
+        when(userRepository.findByUsernameIgnoreCase("Andrei")).thenReturn(Optional.of(existingUser));
 
         assertThrows(IllegalArgumentException.class, () -> userService.signup(request));
         verify(userRepository, never()).save(any(User.class));

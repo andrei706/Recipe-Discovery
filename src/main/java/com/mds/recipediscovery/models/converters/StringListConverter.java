@@ -7,7 +7,6 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Converter

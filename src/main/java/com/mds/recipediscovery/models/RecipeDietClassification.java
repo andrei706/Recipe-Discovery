@@ -1,8 +1,6 @@
 package com.mds.recipediscovery.models;
 
 import jakarta.persistence.*;
-import java.io.Serializable;
-import java.util.Objects;
 
 @Entity
 @Table(name = "recipe_diet_classifications")

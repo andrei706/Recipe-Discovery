@@ -1,7 +1,6 @@
 package com.mds.recipediscovery.models;
 
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 
 @Entity
 @Table(name = "diets")

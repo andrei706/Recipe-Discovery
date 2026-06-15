@@ -1,11 +1,9 @@
 package com.mds.recipediscovery.models;
 
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 import java.util.Set;
 import java.util.List;
 import com.mds.recipediscovery.models.converters.StringListConverter;
-import jakarta.persistence.Convert;
 
 @Entity
 @Table(name = "recipes")

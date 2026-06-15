@@ -1,5 +1,6 @@
 package com.mds.recipediscovery.controller;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,6 +20,17 @@ class RecipeControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
+
+    @BeforeEach
+    void setUp() {
+        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
+        jdbcTemplate.execute("TRUNCATE TABLE users RESTART IDENTITY");
+        jdbcTemplate.execute("INSERT INTO users (user_id, username, email, password) VALUES (1, 'testuser', 'testuser@email.com', 'password123')");
+        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
+    }
 
     @Test
     void testGetAvailableRecipes() throws Exception {
