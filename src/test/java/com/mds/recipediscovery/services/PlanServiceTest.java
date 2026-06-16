@@ -71,6 +71,18 @@ class PlanServiceTest {
         verify(planRepository, times(1)).delete(plan);
     }
     @Test
+    void testDeletePlan_Failure_AiProcessing() {
+        Plan plan = new Plan();
+        plan.setPlanId(1);
+        plan.setAiProcessing(true);
+        when(planRepository.findById(1)).thenReturn(Optional.of(plan));
+        org.springframework.web.server.ResponseStatusException exception =
+            assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> planService.deletePlan(1));
+        assertEquals(org.springframework.http.HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertEquals("Cannot delete a plan while AI is generating meals", exception.getReason());
+        verify(planRepository, never()).delete(any(Plan.class));
+    }
+    @Test
     void testGetPlansByUser_Success() {
         when(userRepository.findById(1)).thenReturn(Optional.of(testUser));
         Plan plan1 = new Plan();

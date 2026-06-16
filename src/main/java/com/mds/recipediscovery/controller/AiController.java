@@ -7,6 +7,7 @@ import com.mds.recipediscovery.dto.PlanDetailResponseDTO;
 import com.mds.recipediscovery.models.MealType;
 import com.mds.recipediscovery.services.AiService;
 import com.mds.recipediscovery.services.PlanDetailsService;
+import com.mds.recipediscovery.services.PlanService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -25,10 +26,12 @@ public class AiController {
 
     private final AiService aiService;
     private final PlanDetailsService planDetailsService;
+    private final PlanService planService;
 
-    public AiController(AiService aiService, PlanDetailsService planDetailsService) {
+    public AiController(AiService aiService, PlanDetailsService planDetailsService, PlanService planService) {
         this.aiService = aiService;
         this.planDetailsService = planDetailsService;
+        this.planService = planService;
     }
 
     @PostMapping("/chat")
@@ -52,6 +55,9 @@ public class AiController {
             Authentication authentication) {
         try {
             Integer userId = getCurrentUserId(authentication);
+            // Block edits by setting AI processing state
+            planService.setPlanAiProcessing(request.getPlanId(), true);
+
             List<Map<String, Object>> assignments = aiService.generateMealPlan(
                     userId, request.getPrompt(), request.getNumDays());
 
@@ -74,6 +80,11 @@ public class AiController {
             throw e;
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
+        } finally {
+            // Unblock edits when finished
+            try {
+                planService.setPlanAiProcessing(request.getPlanId(), false);
+            } catch (Exception ignored) {}
         }
     }
 

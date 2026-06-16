@@ -13,7 +13,7 @@ import {
   deletePlanDetail,
   generateAiPlan,
 } from "../api/plans.js";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const MEAL_TYPES = ["breakfast", "lunch", "dinner", "snack"];
 const MEAL_ICONS = { breakfast: "🌅", lunch: "☀️", dinner: "🌙", snack: "🍎" };
@@ -58,7 +58,17 @@ export default function PlannerPage() {
   const navigate = useNavigate();
 
   const [plans, setPlans] = useState([]);
-  const [activePlanId, setActivePlanId] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activePlanIdStr = searchParams.get("planId");
+  const activePlanId = activePlanIdStr ? Number(activePlanIdStr) : null;
+
+  const setActivePlanId = (id) => {
+    if (id) {
+      setSearchParams({ planId: String(id) });
+    } else {
+      setSearchParams({});
+    }
+  };
   const [planDetails, setPlanDetails] = useState([]);
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -71,7 +81,6 @@ export default function PlannerPage() {
   const [planDayError, setPlanDayError] = useState("");
   const [modalStep, setModalStep] = useState(1); // 1 = dates, 2 = AI prompt
   const [aiPrompt, setAiPrompt] = useState("");
-  const [aiGenerating, setAiGenerating] = useState(false);
 
   // Add-slot modal
   const [showSlotModal, setShowSlotModal] = useState(false);
@@ -88,8 +97,12 @@ export default function PlannerPage() {
     setLoading(true);
     try {
       const data = await getPlans(token);
-      setPlans(data || []);
-      if ((data || []).length > 0 && !activePlanId) setActivePlanId(data[0].planId);
+      // Sort plans by start date descending (newest first)
+      const sorted = (data || []).sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+      setPlans(sorted);
+      if (sorted.length > 0 && !activePlanId) {
+        setSearchParams({ planId: String(sorted[0].planId) });
+      }
     } catch (e) {
       setStatus({ type: "error", message: e.message });
     } finally {
@@ -114,11 +127,55 @@ export default function PlannerPage() {
   };
 
   useEffect(() => { if (!token) return; loadPlans(); loadRecipes(); }, [token]);
-  useEffect(() => { if (!activePlanId) { setPlanDetails([]); return; } loadPlanDetails(activePlanId); }, [activePlanId]);
+  useEffect(() => {
+    setStatus({ type: "", message: "" });
+    if (!activePlanId) {
+      setPlanDetails([]);
+      return;
+    }
+    loadPlanDetails(activePlanId);
+  }, [activePlanId]);
 
   // ── Derived state ───────────────────────────────────────────────────────────
 
   const activePlan = useMemo(() => plans.find((p) => p.planId === activePlanId) || null, [plans, activePlanId]);
+  const [generatingPlanId, setGeneratingPlanId] = useState(null);
+
+  const isPlanBlocked = (planId) => {
+    if (!planId) return false;
+    if (planId === generatingPlanId) return true;
+    const plan = plans.find((p) => p.planId === planId);
+    return !!(plan?.aiProcessing || plan?.isAiProcessing);
+  };
+
+  const isBlocked = isPlanBlocked(activePlanId);
+
+  const hasProcessingPlan = useMemo(() => {
+    return generatingPlanId !== null || plans.some((p) => p.aiProcessing || p.isAiProcessing);
+  }, [plans, generatingPlanId]);
+
+  // Polling for any AI processing plans in the background
+  useEffect(() => {
+    if (!token || !hasProcessingPlan) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const data = await getPlans(token);
+        const sorted = (data || []).sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+        setPlans(sorted);
+
+        // If the active plan was processing but has now finished, load its details!
+        const prevActive = plans.find((p) => p.planId === activePlanId);
+        const nextActive = sorted.find((p) => p.planId === activePlanId);
+        if (prevActive && nextActive && isPlanBlocked(activePlanId) && !(nextActive.aiProcessing || nextActive.isAiProcessing)) {
+          await loadPlanDetails(activePlanId);
+          setStatus({ type: "success", message: "✨ AI meal plan generated!" });
+        }
+      } catch (_) {}
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [token, activePlanId, hasProcessingPlan, plans]);
   const calendarDays = useMemo(() => activePlan ? dateRange(activePlan.startDate, activePlan.endDate) : [], [activePlan]);
 
   // details grouped by "dayNumber-mealType"
@@ -239,7 +296,7 @@ export default function PlannerPage() {
         await loadPlans();
         // Now generate meals if the user gave a prompt
         if (!skipAi && aiPrompt.trim()) {
-          setAiGenerating(true);
+          setGeneratingPlanId(created.planId);
           setStatus({ type: "", message: "" });
           try {
             const numDays = daysBetween(planForm.startDate, planForm.endDate);
@@ -248,7 +305,7 @@ export default function PlannerPage() {
           } catch (aiErr) {
             setStatus({ type: "error", message: "Plan created, but AI generation failed: " + aiErr.message });
           } finally {
-            setAiGenerating(false);
+            setGeneratingPlanId(null);
           }
           await loadPlanDetails(created.planId);
         } else {
@@ -396,34 +453,48 @@ export default function PlannerPage() {
         )}
 
         <ul className="planner-plan-list">
-          {plans.map((plan) => (
-            <li
-              key={plan.planId}
-              className={`planner-plan-item ${plan.planId === activePlanId ? "active" : ""}`}
-              onClick={() => setActivePlanId(plan.planId)}
-            >
-              <div className="planner-plan-item-name">{plan.name}</div>
-              <div className="planner-plan-item-dates">{formatDate(plan.startDate)} → {formatDate(plan.endDate)}</div>
-              <div className="planner-plan-item-actions">
-                <button className="planner-icon-btn edit" title="Edit plan"
-                  onClick={(e) => { e.stopPropagation(); openEditPlan(plan); }}>✏️</button>
-                <button className="planner-icon-btn danger" title="Delete plan"
-                  onClick={(e) => { e.stopPropagation(); handleDeletePlan(plan.planId); }}>🗑️</button>
-              </div>
-            </li>
-          ))}
+          {plans.map((plan) => {
+            const planProcessing = isPlanBlocked(plan.planId);
+            return (
+              <li
+                key={plan.planId}
+                className={`planner-plan-item ${plan.planId === activePlanId ? "active" : ""} ${planProcessing ? "processing" : ""}`}
+                onClick={() => setActivePlanId(plan.planId)}
+              >
+                <div className="planner-plan-item-name">
+                  {plan.name}
+                  {planProcessing && <span className="planner-sidebar-spinner" title="AI is generating meals...">⏳</span>}
+                </div>
+                <div className="planner-plan-item-dates">{formatDate(plan.startDate)} → {formatDate(plan.endDate)}</div>
+                <div className="planner-plan-item-actions">
+                  <button
+                    className="planner-icon-btn edit"
+                    title="Edit plan"
+                    disabled={planProcessing}
+                    onClick={(e) => { e.stopPropagation(); openEditPlan(plan); }}
+                  >✏️</button>
+                  <button
+                    className="planner-icon-btn danger"
+                    title="Delete plan"
+                    disabled={planProcessing}
+                    onClick={(e) => { e.stopPropagation(); handleDeletePlan(plan.planId); }}
+                  >🗑️</button>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       </aside>
 
       {/* ── Main ────────────────────────────────────────────────────────────── */}
       <main className="planner-main">
-        {status.message && (
+        {status.message && !isBlocked && (
           <div className={`${status.type === "success" ? "success" : "alert"} planner-status`}>
             {status.message}
           </div>
         )}
 
-        {aiGenerating && (
+        {isBlocked && (
           <div className="planner-ai-generating">
             <span className="planner-ai-spinner" />
             <span>✨ AI is building your meal plan… this may take a moment</span>
@@ -481,8 +552,8 @@ export default function PlannerPage() {
                         <div key={meal} className="planner-meal-slot">
                           <div className="planner-meal-slot-header">
                             <span>{MEAL_ICONS[meal]} {meal.charAt(0).toUpperCase() + meal.slice(1)}</span>
-                            {/* Hide + button when slot is already filled */}
-                            {!slotFull && (
+                            {/* Hide + button when slot is already filled or plan is generating */}
+                            {!slotFull && !isBlocked && (
                               <button
                                 className="planner-add-meal-btn"
                                 title={`Add ${meal}`}
@@ -497,28 +568,31 @@ export default function PlannerPage() {
                               {items.map((detail) => (
                                 <li
                                   key={detail.planDetailId}
-                                  className={`planner-meal-entry ${detail.isFollowed ? "followed" : ""}`}
+                                  className={`planner-meal-entry ${detail.isFollowed ? "followed" : ""} ${isBlocked ? "blocked" : ""}`}
                                 >
                                   <button
                                     className="planner-check-btn"
+                                    disabled={isBlocked}
                                     onClick={() => handleToggleFollowed(detail)}
                                     title={detail.isFollowed ? "Mark as not followed" : "Mark as followed"}
                                   >{detail.isFollowed ? "✅" : "⬜"}</button>
                                   <span
                                     className="planner-meal-name"
-                                    onClick={() => navigate(`/recipe/${detail.recipeId}`)}
-                                    title="View recipe"
+                                    onClick={() => !isBlocked && navigate(`/recipe/${detail.recipeId}`)}
+                                    title={isBlocked ? "" : "View recipe"}
                                   >
                                     {detail.recipeName}
                                     {detail.quantity > 1 && (
                                       <span className="planner-qty-badge">×{detail.quantity}</span>
                                     )}
                                   </span>
-                                  <button
-                                    className="planner-del-btn"
-                                    onClick={() => handleDeleteDetail(detail.planDetailId)}
-                                    title="Remove"
-                                  >×</button>
+                                  {!isBlocked && (
+                                    <button
+                                      className="planner-del-btn"
+                                      onClick={() => handleDeleteDetail(detail.planDetailId)}
+                                      title="Remove"
+                                    >×</button>
+                                  )}
                                 </li>
                               ))}
                             </ul>
@@ -532,6 +606,7 @@ export default function PlannerPage() {
                       <div className="planner-day-footer">
                         <button
                           className="planner-footer-btn mark-all"
+                          disabled={isBlocked}
                           onClick={() => handleMarkAllDay(dayNum)}
                           title={allFollowed ? "Unmark all" : "Mark all as followed"}
                         >
@@ -781,7 +856,7 @@ export default function PlannerPage() {
                   <button
                     className="primary-btn"
                     onClick={() => handleAddMissingToInventory(ingRows)}
-                    disabled={addingInventory}
+                    disabled={addingInventory || isBlocked}
                   >
                     {addingInventory
                       ? "Adding…"

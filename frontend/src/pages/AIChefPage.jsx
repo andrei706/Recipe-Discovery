@@ -67,7 +67,7 @@ export default function AIChefPage() {
   
   const [messages, setMessages] = useState(DEFAULT_MESSAGES);
 
-  const messagesEndRef = useRef(null);
+  const chatMessagesRef = useRef(null);
 
   // Load user inventory and recipe details
   const loadData = async () => {
@@ -124,9 +124,17 @@ export default function AIChefPage() {
     writeChatLogs(nextLogs);
   }, [messages]);
 
-  // Scroll to bottom when messages list changes
+  // Scroll to bottom when messages list changes, debounced to let DOM layout settle
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const timer = setTimeout(() => {
+      if (chatMessagesRef.current) {
+        chatMessagesRef.current.scrollTo({
+          top: chatMessagesRef.current.scrollHeight,
+          behavior: "smooth"
+        });
+      }
+    }, 100);
+    return () => clearTimeout(timer);
   }, [messages, loading]);
 
   const normalizeAiResponse = (aiResponse) => {
@@ -273,7 +281,7 @@ export default function AIChefPage() {
             <h3>💬 Chat with AI Chef</h3>
           </div>
 
-          <div className="chat-messages">
+          <div className="chat-messages" ref={chatMessagesRef}>
             {messages.map((msg) => (
               <div
                 key={msg.id}
@@ -317,7 +325,6 @@ export default function AIChefPage() {
                 </div>
               </div>
             )}
-            <div ref={messagesEndRef} />
           </div>
 
           <form className="chat-input-area" onSubmit={handleSend}>

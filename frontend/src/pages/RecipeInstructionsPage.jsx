@@ -23,13 +23,13 @@ export default function RecipeInstructionsPage() {
   if (!data) return null;
 
   const { recipe } = data;
-  const normalizedDescription = (recipe.description || "")
+  const normalizedSteps = (recipe.preparationSteps || "")
     .replace(/\\r\\n/g, "\n")
     .replace(/\\n/g, "\n")
     .replace(/\/n/g, "\n");
-  const descriptionParts = normalizedDescription.split(/\n\s*\n/);
-  const instructionText = descriptionParts[0] || "";
-  const notesText = descriptionParts.slice(1).join("\n\n");
+  const stepParts = normalizedSteps.split(/\n\s*\n/);
+  const instructionText = stepParts[0] || "";
+  const notesText = stepParts.slice(1).join("\n\n");
   const steps = instructionText
     .split(/(?<=\.)\s+/)
     .map((step) => step.trim())
@@ -41,7 +41,7 @@ export default function RecipeInstructionsPage() {
         <span className="instructions-eyebrow">Preparation guide</span>
         <h2>{recipe.name}</h2>
         <p className="instructions-subtitle">Follow each step, then come back to your ingredients whenever you need.</p>
-        <button type="button" className="secondary-btn" onClick={() => navigate(`/recipe/${recipeId}`)}>
+        <button type="button" className="secondary-btn" onClick={() => navigate(`/recipe/${recipeId}`, { replace: true })}>
           Back to ingredients
         </button>
       </div>

@@ -148,18 +148,26 @@ export default function RecipesPage() {
         ) : null}
         {loading ? <div className="card">Loading recipes...</div> : null}
 
-        <div className="grid grid-3">
-          {filtered.map(({ recipe, match }) => (
-            <RecipeCard
-              key={recipe.recipeId || recipe.name}
-              recipe={recipe}
-              match={match}
-              details={detailsMap[recipe.recipeId]}
-              onCook={() => handleCook(recipe.recipeId)}
-              onDietClick={handleDietClick}
-            />
-          ))}
-        </div>
+        {!loading && filtered.length === 0 ? (
+          <div className="card" style={{ textAlign: "center", padding: "32px 16px", color: "#6b7280" }}>
+            <div style={{ fontSize: 24, marginBottom: 8 }}>🍳</div>
+            <h3 style={{ margin: "0 0 8px 0", color: "#1f2937" }}>No recipes found</h3>
+            <p style={{ margin: 0, fontSize: 14 }}>Try adjusting your search filters or adding more ingredients to your inventory.</p>
+          </div>
+        ) : (
+          <div className="grid grid-3">
+            {filtered.map(({ recipe, match }) => (
+              <RecipeCard
+                key={recipe.recipeId || recipe.name}
+                recipe={recipe}
+                match={match}
+                details={detailsMap[recipe.recipeId]}
+                onCook={() => handleCook(recipe.recipeId)}
+                onDietClick={handleDietClick}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="grid recipes-filter-panel" style={{ gap: 16 }}>

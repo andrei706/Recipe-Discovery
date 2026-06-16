@@ -27,6 +27,9 @@ public class Plan {
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
 
+    @Column(name = "is_ai_processing", nullable = false)
+    private boolean isAiProcessing = false;
+
     @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PlanDetails> details;
 
@@ -44,6 +47,8 @@ public class Plan {
     public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { isActive = active; }
+    public boolean isAiProcessing() { return isAiProcessing; }
+    public void setAiProcessing(boolean aiProcessing) { isAiProcessing = aiProcessing; }
     public Set<PlanDetails> getDetails() { return details; }
     public void setDetails(Set<PlanDetails> details) { this.details = details; }
 }

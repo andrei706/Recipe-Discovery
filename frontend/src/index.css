@@ -380,14 +380,27 @@ canvas {
 }
 
 .inventory-grid {
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
 }
 
 .inventory-card {
-  display: grid;
-  gap: 12px;
-  border: 1px solid transparent;
-  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.inventory-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  border-color: #cbd5e1;
 }
 
 .inventory-card.focused {
@@ -395,9 +408,129 @@ canvas {
   box-shadow: 0 0 0 3px rgba(242, 140, 40, 0.15);
 }
 
+.inventory-card.unsaved {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+.inventory-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+}
+
+.inventory-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
 .inventory-title {
-  font-weight: 600;
   font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.badge-wrap {
+  display: flex;
+}
+
+.inventory-card .badge {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #ffedd5;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.inventory-delete-btn {
+  background: transparent;
+  color: #94a3b8;
+  border: none;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.inventory-delete-btn:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.inventory-input-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+}
+
+.inventory-qty-input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+  color: #334155;
+  background-color: #f8fafc;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.inventory-qty-input:focus {
+  outline: none;
+  border-color: #f28c28;
+  background-color: #ffffff;
+}
+
+.inventory-save-btn {
+  background: #f28c28;
+  color: #ffffff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease-in-out;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  width: 0;
+  padding: 8px 0;
+  margin-left: -8px;
+  overflow: hidden;
+}
+
+.inventory-save-btn.visible {
+  opacity: 1;
+  visibility: visible;
+  width: auto;
+  padding: 8px 14px;
+  margin-left: 0;
+}
+
+.inventory-save-btn:hover {
+  background: #e07b16;
 }
 
 .inventory-actions {
@@ -2067,4 +2200,86 @@ canvas {
 [data-theme="dark"] .planner-sidebar-header,
 [data-theme="dark"] .planner-day-footer {
   border-color: #2f3542;
+}
+
+[data-theme="dark"] .inventory-card {
+  background: #171b24;
+  border-color: #2f3542;
+  color: #e5e7eb;
+}
+
+[data-theme="dark"] .inventory-card:hover {
+  border-color: #4b5563;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .inventory-card.focused {
+  border-color: #f28c28;
+  box-shadow: 0 0 0 3px rgba(242, 140, 40, 0.25);
+}
+
+[data-theme="dark"] .inventory-card.unsaved {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+}
+
+[data-theme="dark"] .inventory-title {
+  color: #f9fafb;
+}
+
+[data-theme="dark"] .inventory-card .badge {
+  background: #2a1b12;
+  color: #fed7aa;
+  border-color: #431407;
+}
+
+[data-theme="dark"] .inventory-delete-btn {
+  color: #6b7280;
+}
+
+[data-theme="dark"] .inventory-delete-btn:hover {
+  background: #7f1d1d;
+  color: #fca5a5;
+}
+
+[data-theme="dark"] .inventory-qty-input {
+  background-color: #0f172a;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .inventory-qty-input:focus {
+  background-color: #1e293b;
+  border-color: #f28c28;
+}
+
+.planner-icon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.planner-plan-item.processing {
+  border-left: 4px solid #cbd5e1;
+  background: #f8fafc;
+}
+
+[data-theme="dark"] .planner-plan-item.processing {
+  border-left-color: #475569;
+  background: #1e293b;
+}
+
+.planner-sidebar-spinner {
+  margin-left: 8px;
+  display: inline-block;
+  animation: plannerSpinnerSpin 2s linear infinite;
+}
+
+@keyframes plannerSpinnerSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.planner-meal-entry.blocked {
+  opacity: 0.75;
 }

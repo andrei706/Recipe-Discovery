@@ -180,55 +180,69 @@ export default function InventoryPage() {
       ) : null}
 
       <div className="grid inventory-grid">
-        {filteredInventory.map((item) => (
-          <div
-            className={`card inventory-card ${focusedId === item.ingredientId ? "focused" : ""}`}
-            key={item.ingredientId}
-            onClick={() => setFocusedId(item.ingredientId)}
-          >
-            <div className="inventory-title">{item.ingredientName}</div>
-            <div className="badge">Unit: {item.measurementUnit}</div>
-            <div className="form-row">
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={editValues[item.ingredientId] ?? ""}
-                onFocus={() => setFocusedId(item.ingredientId)}
-                onChange={(event) =>
-                  setEditValues((prev) => ({
-                    ...prev,
-                    [item.ingredientId]: event.target.value
-                  }))
-                }
-              />
-              {focusedId === item.ingredientId && (
-                <div className="inventory-actions">
-                  <button
-                    type="button"
-                    className="secondary-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleUpdate(item.ingredientId);
-                    }}
-                  >
-                    Save
-                  </button>
-                  <button
-                    type="button"
-                    className="danger-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemove(item.ingredientId);
-                    }}
-                  >
-                    Remove
-                  </button>
+        {filteredInventory.map((item) => {
+          const isChanged = (editValues[item.ingredientId] ?? "") !== String(formatQty(item.quantity));
+          return (
+            <div
+              className={`card inventory-card ${isChanged ? "unsaved" : ""} ${focusedId === item.ingredientId ? "focused" : ""}`}
+              key={item.ingredientId}
+              onClick={() => setFocusedId(item.ingredientId)}
+            >
+              <div className="inventory-card-header">
+                <div className="inventory-title-wrap">
+                  <span className="inventory-title" title={item.ingredientName}>{item.ingredientName}</span>
+                  <div className="badge-wrap">
+                    <span className="badge">Unit: {item.measurementUnit}</span>
+                  </div>
                 </div>
-              )}
+                <button
+                  type="button"
+                  className="inventory-delete-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemove(item.ingredientId);
+                  }}
+                  title="Remove from inventory"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 6h18" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    <line x1="10" y1="11" x2="10" y2="17" />
+                    <line x1="14" y1="11" x2="14" y2="17" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="inventory-input-group">
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  className="inventory-qty-input"
+                  value={editValues[item.ingredientId] ?? ""}
+                  onFocus={() => setFocusedId(item.ingredientId)}
+                  onChange={(event) =>
+                    setEditValues((prev) => ({
+                      ...prev,
+                      [item.ingredientId]: event.target.value
+                    }))
+                  }
+                />
+                <button
+                  type="button"
+                  className={`inventory-save-btn ${isChanged ? "visible" : ""}`}
+                  disabled={!isChanged}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleUpdate(item.ingredientId);
+                  }}
+                >
+                  Save
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {isModalOpen ? (
@@ -287,7 +301,9 @@ export default function InventoryPage() {
                 onChange={(event) => setForm((prev) => ({ ...prev, quantity: event.target.value }))}
                 required
               />
-              <div className="badge">Unit: {selectedIngredient?.measurementUnit || "-"}</div>
+              <div className="badge-wrap">
+                <span className="badge">Unit: {selectedIngredient?.measurementUnit || "-"}</span>
+              </div>
               <div className="inventory-actions">
                 <button type="submit" className="primary-btn">
                   Add

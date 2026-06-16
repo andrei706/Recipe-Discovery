@@ -21,6 +21,9 @@ public class Recipe {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "preparation_steps", columnDefinition = "TEXT")
+    private String preparationSteps;
+
     @Column(name = "calories_kcal", nullable = false)
     private float caloriesKcal;
 
@@ -65,6 +68,8 @@ public class Recipe {
     public void setDietClassifications(Set<Diet> dietClassifications) { this.dietClassifications = dietClassifications; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+    public String getPreparationSteps() { return preparationSteps; }
+    public void setPreparationSteps(String preparationSteps) { this.preparationSteps = preparationSteps; }
     public List<String> getFeatures() { return features; }
     public void setFeatures(List<String> features) { this.features = features; }
 }

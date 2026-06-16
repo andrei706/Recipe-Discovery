@@ -81,7 +81,7 @@ export default function RecipePage() {
         </div>
       ) : null}
 
-      <div className="recipe-details-layout recipe-details-layout-single">
+      <div className={`recipe-details-layout ${!recipe.description ? "recipe-details-layout-single" : ""}`}>
         <div className="grid" style={{ gap: 16 }}>
           <div className="card">
             <h3 style={{ marginTop: 0 }}>Nutritional Information</h3>
@@ -156,6 +156,13 @@ export default function RecipePage() {
             </button>
           </div>
         </div>
+
+        {recipe.description ? (
+          <div className="card">
+            <h3 style={{ marginTop: 0 }}>About this recipe</h3>
+            <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>{recipe.description}</p>
+          </div>
+        ) : null}
       </div>
 
       {showCookModal ? (

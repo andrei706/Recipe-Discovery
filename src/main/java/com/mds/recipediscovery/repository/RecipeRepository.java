@@ -39,6 +39,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
            "LEFT JOIN RecipeNecessities rn ON rn.recipe = r " +
            "WHERE LOWER(r.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
            "OR LOWER(r.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+           "OR LOWER(r.preparationSteps) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
            "OR LOWER(rn.ingredient.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
     List<Recipe> searchRecipesByTerm(@Param("searchTerm") String searchTerm);
 }
