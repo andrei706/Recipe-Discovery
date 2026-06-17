@@ -6,7 +6,6 @@ import { useAuth } from "../context/AuthContext.jsx";
 export default function LoginPage() {
   const navigate = useNavigate();
   const { saveAuth, token } = useAuth();
-  const [loginType, setLoginType] = useState("USERNAME");
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -21,7 +20,8 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     try {
-      const response = await login({ loginType, identifier, password });
+      const computedLoginType = identifier.includes("@") ? "EMAIL" : "USERNAME";
+      const response = await login({ loginType: computedLoginType, identifier, password });
       saveAuth({
         token: response.token,
         tokenType: response.tokenType,
@@ -45,13 +45,9 @@ export default function LoginPage() {
       <h2>Login</h2>
       {error ? <div className="alert">{error}</div> : null}
       <form className="form-row" onSubmit={handleSubmit}>
-        <select value={loginType} onChange={(event) => setLoginType(event.target.value)}>
-          <option value="USERNAME">Username</option>
-          <option value="EMAIL">Email</option>
-        </select>
         <input
           type="text"
-          placeholder={loginType === "USERNAME" ? "Username" : "Email"}
+          placeholder="Username or Email"
           value={identifier}
           onChange={(event) => setIdentifier(event.target.value)}
           required

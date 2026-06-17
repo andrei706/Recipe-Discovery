@@ -25,11 +25,16 @@ public class UserService {
     }
 
     public LoginResponseDTO login(LoginRequestDTO request) {
-        if (request == null || isBlank(request.getIdentifier()) || isBlank(request.getPassword()) || isBlank(request.getLoginType())) {
-            throw new IllegalArgumentException("loginType, identifier and password are required");
+        if (request == null || isBlank(request.getIdentifier()) || isBlank(request.getPassword())) {
+            throw new IllegalArgumentException("identifier and password are required");
         }
 
-        User user = findUserByLoginType(request.getLoginType(), request.getIdentifier());
+        String loginType = request.getLoginType();
+        if (isBlank(loginType)) {
+            loginType = request.getIdentifier().contains("@") ? "EMAIL" : "USERNAME";
+        }
+
+        User user = findUserByLoginType(loginType, request.getIdentifier());
 
         if (!matchesPassword(request.getPassword(), user)) {
             throw new SecurityException("Invalid credentials");

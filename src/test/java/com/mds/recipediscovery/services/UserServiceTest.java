@@ -34,14 +34,12 @@ class UserServiceTest {
     private UserRepository userRepository;
 
     private PasswordEncoder passwordEncoder;
-    private JwtService jwtService;
-
     private UserService userService;
 
     @BeforeEach
     void setUp() {
         passwordEncoder = new BCryptPasswordEncoder();
-        jwtService = new JwtService();
+        JwtService jwtService = new JwtService();
         ReflectionTestUtils.setField(jwtService, "jwtSecret", "test-secret-key-with-at-least-32-characters");
         ReflectionTestUtils.setField(jwtService, "jwtExpirationMs", 3600000L);
         userService = new UserService(userRepository, passwordEncoder, jwtService);
@@ -179,6 +177,49 @@ class UserServiceTest {
 
         assertThrows(SecurityException.class, () -> userService.changePassword(3, request));
         verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void loginWithAutoDetectedUsername_ReturnsToken() {
+        User user = new User();
+        user.setUserId(1);
+        user.setUsername("Andrei");
+        user.setEmail("andrei@email.com");
+        user.setPassword(passwordEncoder.encode("passAndrei1"));
+
+        LoginRequestDTO request = new LoginRequestDTO();
+        request.setIdentifier("Andrei");
+        request.setPassword("passAndrei1");
+
+        when(userRepository.findByUsernameIgnoreCase("Andrei")).thenReturn(Optional.of(user));
+
+        LoginResponseDTO response = userService.login(request);
+
+        assertTrue(response.getToken() != null && !response.getToken().isBlank());
+        assertEquals("Bearer", response.getTokenType());
+        assertEquals(1, response.getUserId());
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void loginWithAutoDetectedEmail_ReturnsToken() {
+        User user = new User();
+        user.setUserId(2);
+        user.setUsername("Elena");
+        user.setEmail("elena@email.com");
+        user.setPassword(passwordEncoder.encode("passElena2"));
+
+        LoginRequestDTO request = new LoginRequestDTO();
+        request.setIdentifier("elena@email.com");
+        request.setPassword("passElena2");
+
+        when(userRepository.findByEmailIgnoreCase("elena@email.com")).thenReturn(Optional.of(user));
+
+        LoginResponseDTO response = userService.login(request);
+
+        assertTrue(response.getToken() != null && !response.getToken().isBlank());
+        assertEquals("Bearer", response.getTokenType());
+        assertEquals(2, response.getUserId());
     }
 }
 
