@@ -95,12 +95,19 @@ export default function RecipesPage() {
       });
     }
     if (recipeSearch) {
-      result = result.filter(({ recipe }) =>
-        recipe.name.toLowerCase().includes(recipeSearch.toLowerCase())
-      );
+      const q = recipeSearch.trim().toLowerCase();
+      result = result.filter(({ recipe }) => {
+        const matchesName = (recipe?.name || "").toLowerCase().includes(q);
+        const matchesDescription = (recipe?.description || "").toLowerCase().includes(q);
+        const ingredients = detailsMap[recipe?.recipeId]?.ingredients || [];
+        const matchesIngredients = ingredients.some((ing) =>
+          (ing.ingredientName || "").toLowerCase().includes(q)
+        );
+        return matchesName || matchesDescription || matchesIngredients;
+      });
     }
     return result;
-  }, [dietFilters, recipeSearch, normalizedRecipes]);
+  }, [dietFilters, recipeSearch, normalizedRecipes, detailsMap]);
 
   const handleCook = (recipeId) => {
     navigate(`/recipe/${recipeId}`);

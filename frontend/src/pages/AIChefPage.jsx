@@ -53,6 +53,52 @@ const buildMessagesFromRecentLogs = (logs) => {
   return [DEFAULT_MESSAGES[0], ...historyMessages];
 };
 
+function DelayedRecipes({ recipes, handleViewRecipe, resolveRecommendedDetails, onRendered }) {
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShow(true);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (show && onRendered) {
+      const scrollTimer = setTimeout(() => {
+        onRendered();
+      }, 100);
+      return () => clearTimeout(scrollTimer);
+    }
+  }, [show, onRendered]);
+
+  if (!show) return null;
+
+  const resolved = resolveRecommendedDetails(recipes);
+  if (resolved.length === 0) return null;
+
+  return (
+    <div style={{ marginTop: "16px", display: "grid", gap: "12px" }}>
+      {resolved.map((details) => {
+        const id = details.recipe.recipeId;
+        return (
+          <RecipeCard
+            key={id}
+            recipe={details.recipe}
+            match={{
+              matchedIngredients: details.matchedIngredients,
+              totalIngredients: details.totalIngredients,
+              matchPercentage: details.matchPercentage
+            }}
+            details={details}
+            onCook={() => handleViewRecipe(id)}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
 export default function AIChefPage() {
   const { token } = useAuth();
   const navigate = useNavigate();
@@ -124,16 +170,18 @@ export default function AIChefPage() {
     writeChatLogs(nextLogs);
   }, [messages]);
 
+  const scrollToBottom = () => {
+    if (chatMessagesRef.current) {
+      chatMessagesRef.current.scrollTo({
+        top: chatMessagesRef.current.scrollHeight,
+        behavior: "smooth"
+      });
+    }
+  };
+
   // Scroll to bottom when messages list changes, debounced to let DOM layout settle
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (chatMessagesRef.current) {
-        chatMessagesRef.current.scrollTo({
-          top: chatMessagesRef.current.scrollHeight,
-          behavior: "smooth"
-        });
-      }
-    }, 100);
+    const timer = setTimeout(scrollToBottom, 100);
     return () => clearTimeout(timer);
   }, [messages, loading]);
 
@@ -289,26 +337,14 @@ export default function AIChefPage() {
               >
                 <div style={{ whiteSpace: "pre-wrap" }}>{msg.text}</div>
 
-                {/* Render Recipe Cards suggested by Agent 1 */}
+                {/* Render Recipe Cards suggested by Agent 1 with a delay */}
                 {msg.sender === "ai" && msg.recommendedRecipes && msg.recommendedRecipes.length > 0 && (
-                  <div style={{ marginTop: "16px", display: "grid", gap: "12px" }}>
-                    {resolveRecommendedDetails(msg.recommendedRecipes).map((details) => {
-                      const id = details.recipe.recipeId;
-                      return (
-                        <RecipeCard
-                          key={id}
-                          recipe={details.recipe}
-                          match={{
-                            matchedIngredients: details.matchedIngredients,
-                            totalIngredients: details.totalIngredients,
-                            matchPercentage: details.matchPercentage
-                          }}
-                          details={details}
-                          onCook={() => handleViewRecipe(id)}
-                        />
-                      );
-                    })}
-                  </div>
+                  <DelayedRecipes
+                    recipes={msg.recommendedRecipes}
+                    handleViewRecipe={handleViewRecipe}
+                    resolveRecommendedDetails={resolveRecommendedDetails}
+                    onRendered={scrollToBottom}
+                  />
                 )}
               </div>
             ))}
@@ -320,9 +356,7 @@ export default function AIChefPage() {
                   <span></span>
                   <span></span>
                 </div>
-                <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>
-                  AI chefs are analyzing your ingredients...
-                </div>
+
               </div>
             )}
           </div>
@@ -330,7 +364,7 @@ export default function AIChefPage() {
           <form className="chat-input-area" onSubmit={handleSend}>
             <input
               type="text"
-              placeholder="Enter your message (e.g. 'something sweet with apples' or 'a quick lunch')"
+              placeholder="Enter your message..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               disabled={loading}

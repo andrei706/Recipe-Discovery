@@ -198,7 +198,17 @@ INSERT INTO recipes (name, description, preparation_steps, total_prep_time_minut
                                                                                                                                                               ('Fried Rice with Vegetables', 'Classic wok-fried rice tossed with colorful mixed vegetables and egg.', 'Heat oil in a wok or large skillet over high heat until the oil just begins to smoke (230°C / 450°F). Stir-fry diced onion, carrot and peas for 3-4 minutes until the vegetables are tender-crisp and slightly charred at the edges. Push vegetables to the side and add cooked cold rice, breaking up clumps. Stir-fry for 2-3 minutes until the rice starts to lightly toast, then drizzle in soy sauce and sesame oil. Toss in beaten egg or scrambled eggs and cook, stirring constantly, until the egg is set and evenly distributed. Season with garlic powder and white pepper. Serve hot immediately.\\n\\nPrep/Cook notes: using day-old cold rice prevents clumping; high heat gives "wok hei" flavor. Total time ~12-15 minutes.', 15, 310.00, 14.00, 2.50, 38.00, 4.00, 12.00, 1.40),
                                                                                                                                                               ('Caesar Salad', 'Crisp romaine lettuce tossed in a creamy, savory Caesar dressing with croutons.', 'Wash and tear romaine lettuce into bite-sized pieces and place in a large bowl. In a small bowl, whisk together minced garlic, anchovies (if using), lemon juice, Worcestershire sauce, egg yolk and olive oil to create the dressing. Toss the lettuce with the dressing until well coated. Top with shaved or grated Parmesan cheese and croutons. Serve immediately.\\n\\nPrep/Cook notes: the dressing can be made ahead; for raw egg concerns, use pasteurized eggs or substitute with mayonnaise. Total time ~10 minutes.', 10, 200.00, 16.00, 3.50, 8.00, 1.50, 9.00, 1.20),
                                                                                                                                                               ('Beef Stew', 'A hearty, slow-cooked stew with tender beef chunks, potatoes, and carrots.', 'Cut beef into 2-3 cm cubes and pat dry. Brown meat in batches in a hot pot with oil over high heat; set aside. In the same pot, sauté diced onion and garlic until softened. Add tomato paste and stir for 1 minute. Return meat to the pot and add beef broth, red wine (optional), potatoes, carrots and mushrooms. Bring to a simmer, cover and cook for 90-120 minutes until meat is tender (internal temperature reaching 95°C / 200°F ensures tenderness). Season with salt, pepper and Worcestershire sauce. Serve hot.\\n\\nPrep/Cook notes: slow cooking on low heat ensures tender meat; check periodically and add broth if the stew becomes too thick.', 120, 380.00, 16.00, 5.00, 25.00, 5.00, 35.00, 1.80),
-                                                                                                                                                              ('Fish and Chips', 'Crispy, beer-battered fried fish served with golden potato chips.', 'Cut white fish fillet into portions and coat lightly with flour seasoned with salt and pepper. Heat oil in a deep skillet to 180°C (350°F). Fry fish 3-4 minutes per side until golden and crispy; remove and drain on paper towels. Cut potatoes into thin chips, fry in batches for 5-7 minutes until golden and crispy (internal fish temperature should be 63°C / 145°F). Serve fish and chips hot with malt vinegar, tartar sauce or lemon wedges.\\n\\nPrep/Cook notes: oil temperature is critical for crispy results; use a thermometer. Drain well to avoid excess oil.', 30, 450.00, 22.00, 4.50, 45.00, 2.00, 30.00, 1.60);
+                                                                                                                                                                                                                                                                                                                             ('Fish and Chips', 'Crispy, beer-battered fried fish served with golden potato chips.', 'Cut white fish fillet into portions and coat lightly with flour seasoned with salt and pepper. Heat oil in a deep skillet to 180°C (350°F). Fry fish 3-4 minutes per side until golden and crispy; remove and drain on paper towels. Cut potatoes into thin chips, fry in batches for 5-7 minutes until golden and crispy (internal fish temperature should be 63°C / 145°F). Serve fish and chips hot with malt vinegar, tartar sauce or lemon wedges.\\n\\nPrep/Cook notes: oil temperature is critical for crispy results; use a thermometer. Drain well to avoid excess oil.', 30, 450.00, 22.00, 4.50, 45.00, 2.00, 30.00, 1.60);
+
+INSERT INTO recipes (name, description, preparation_steps, total_prep_time_minutes, calories_kcal, fats_g, saturated_fats_g, carbohydrates_g, sugars_g, proteins_g, salt_g) VALUES
+('Ribeye Steak', 'Perfect pan-seared ribeye steak basted with butter.', 'Preheat a cast iron skillet over high heat. Season ribeye steak generously with salt and pepper. Sear for 3-4 minutes on each side. Add a dollop of butter to the pan in the final minute and baste the steak. Let rest for 5 minutes before slicing.', 15, 600.00, 45.00, 18.00, 0.00, 0.00, 48.00, 1.50),
+('Scrambled Eggs with Cheddar', 'Fluffy scrambled eggs whisked with melted cheddar cheese.', 'Whisk eggs in a bowl with a pinch of salt and pepper. Melt butter in a non-stick skillet over medium-low heat. Pour in the eggs and cook, stirring slowly. Just before they are set, fold in grated cheddar cheese until melted. Serve warm.', 10, 320.00, 24.00, 10.00, 1.00, 0.00, 22.00, 0.80),
+('Baked Salmon with Butter', 'Flaky baked salmon fillet topped with melted butter.', 'Preheat oven to 200°C (400°F). Place salmon fillet on a baking sheet. Season with salt, pepper, and pour melted butter over it. Bake for 12-15 minutes until flaky. Serve hot.', 15, 380.00, 26.00, 8.00, 0.00, 0.00, 34.00, 0.60),
+('Crispy Duck Breast', 'Pan-seared duck breast with a crispy skin.', 'Score the skin of the duck breast. Place skin-side down in a cold skillet. Heat to medium and render the fat for 8-10 minutes until crispy. Flip and cook for 3-4 minutes. Let rest before slicing.', 20, 480.00, 36.00, 12.00, 0.00, 0.00, 38.00, 0.50),
+('Raw Avocado and Tomato Salad', 'A fresh, raw salad with ripe avocado, tomatoes, and crisp cucumber.', 'Dice avocado, tomatoes, and cucumber into bite-sized pieces. Toss together in a salad bowl. Drizzle with extra virgin olive oil, fresh lemon juice, and a pinch of salt and pepper. Serve cold.', 10, 250.00, 22.00, 3.00, 12.00, 4.00, 3.00, 0.40),
+('Chia Seed Berry Pudding', 'A healthy, raw pudding made with chia seeds, coconut milk, and fresh berries.', 'Whisk chia seeds and coconut milk together in a jar. Let sit for 5 minutes, stir again, then refrigerate for at least 4 hours (or overnight) to set. Top with fresh strawberries and blueberries before serving.', 10, 180.00, 8.00, 4.00, 15.00, 6.00, 4.00, 0.10),
+('Cucumber and Red Cabbage Salad', 'Crispy raw cucumber and red cabbage tossed with sesame oil.', 'Thinly slice cucumber and red cabbage. Combine in a bowl. Drizzle with sesame oil, rice vinegar, and top with toasted sesame seeds. Toss well and serve fresh.', 10, 120.00, 9.00, 1.50, 8.00, 3.00, 2.00, 0.30),
+('Almond Banana Smoothie', 'A creamy, raw smoothie made with almonds, fresh banana, and baby spinach.', 'Combine almonds, banana, fresh spinach, and cold water in a high-speed blender. Blend until completely smooth and creamy. Pour into a glass and serve immediately.', 5, 280.00, 14.00, 1.50, 36.00, 18.00, 8.00, 0.10);
 
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity) VALUES
                                                                          (1, 1, 200), (1, 2, 80), (1, 3, 150), (2, 7, 250), (2, 8, 200), (3, 10, 1), (3, 11, 100),
@@ -225,6 +235,16 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity) VALUES
                                                                          (34, 59, 300), (34, 26, 1), (34, 22, 100), (34, 90, 0.75), (34, 91, 0.02), (34, 5, 2), (34, 6, 1),
                                                                          (35, 82, 300), (35, 59, 300), (35, 85, 0.50), (35, 86, 1), (35, 93, 0.03), (35, 5, 2), (35, 6, 1);
 
+INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity) VALUES
+(36, 20, 250.00), (36, 88, 20.00), (36, 5, 2.00), (36, 6, 1.00),
+(37, 12, 3.00), (37, 33, 40.00), (37, 88, 15.00), (37, 5, 1.00),
+(38, 7, 200.00), (38, 88, 20.00), (38, 5, 1.00), (38, 6, 1.00),
+(39, 81, 200.00), (39, 5, 1.00), (39, 6, 1.00),
+(40, 10, 1.00), (40, 17, 100.00), (40, 65, 1.00), (40, 74, 0.02), (40, 5, 1.00),
+(41, 36, 30.00), (41, 16, 0.20), (41, 48, 50.00), (41, 47, 50.00),
+(42, 65, 1.00), (42, 75, 150.00), (42, 79, 10.00), (42, 96, 0.015), (42, 80, 0.015),
+(43, 34, 30.00), (43, 46, 1.00), (43, 14, 50.00);
+
 INSERT INTO recipe_diet_classifications (recipe_id, diet_id) VALUES
                                                                   (1, 5), (1, 2), (2, 7), (2, 5), (2, 2), (3, 4), (3, 2), (4, 1), (4, 4), (4, 2),
                                                                   (5, 5), (5, 2), (5, 6), (6, 7), (6, 5), (6, 2), (7, 1), (7, 4), (7, 2), (8, 1), (8, 4), (8, 2),
@@ -234,6 +254,16 @@ INSERT INTO recipe_diet_classifications (recipe_id, diet_id) VALUES
                                                                   (22, 4), (23, 5), (23, 2), (24, 5), (24, 2), (25, 1), (25, 4), (26, 5), (26, 2), (27, 4), (27, 2), (28, 7), (28, 2),
                                                                   (29, 5), (29, 2), (29, 6), (29, 3), (30, 5), (30, 2), (31, 5), (31, 2), (31, 3), (31, 6), (32, 5), (32, 2), (33, 4), (33, 2),
                                                                   (34, 5), (34, 2), (35, 7);
+
+INSERT INTO recipe_diet_classifications (recipe_id, diet_id) VALUES
+(36, 9), (36, 3), (36, 5), (36, 2),
+(37, 9), (37, 3), (37, 4), (37, 2),
+(38, 9), (38, 3), (38, 7), (38, 2),
+(39, 9), (39, 3), (39, 5), (39, 2),
+(40, 10), (40, 1), (40, 4), (40, 2),
+(41, 10), (41, 1), (41, 4), (41, 2), (41, 8),
+(42, 10), (42, 1), (42, 4), (42, 2),
+(43, 10), (43, 1), (43, 4), (43, 2);
 
 INSERT INTO user_dietary_preferences (user_id, diet_id) VALUES
                                                             (1, 5), (1, 6), (2, 3), (2, 7), (2, 8), (3, 4), (3, 9), (4, 10);
