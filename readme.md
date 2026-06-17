@@ -2,8 +2,9 @@
 
 A web application that helps users discover recipes based on the ingredients they already have. Users can manage their personal ingredient inventory, explore matching recipes, chat with an AI cooking assistant, and generate personalized meal plans.
 
-> **Project documentation (Romanian):** [Recipe Discovery - Technical Report](https://docs.google.com/document/d/1DnVt5wJ-H-TxImE4ZdVCxzWtQZN0lEsnuDr36GdX1hg/edit?tab=t.0)
-
+Project documentation with more diagrams and information regarding the development of the project in Romanian can be found on the following link:
+ 📄 [Recipe Discovery - Technical Report](https://docs.google.com/document/d/1DnVt5wJ-H-TxImE4ZdVCxzWtQZN0lEsnuDr36GdX1hg/edit?tab=t.0)
+ 
 ## Features
 
 - **Ingredient Inventory** — Add, update, and remove ingredients with quantities
