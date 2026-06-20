@@ -1,4 +1,3 @@
-DROP TABLE IF EXISTS user_dietary_preferences;
 DROP TABLE IF EXISTS recipe_diet_classifications;
 DROP TABLE IF EXISTS inventory;
 DROP TABLE IF EXISTS plan_details;
@@ -81,14 +80,6 @@ CREATE TABLE recipe_diet_classifications (
                                              PRIMARY KEY (recipe_id, diet_id),
                                              CONSTRAINT fk_class_recipe FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id) ON DELETE CASCADE,
                                              CONSTRAINT fk_class_diet FOREIGN KEY (diet_id) REFERENCES diets(diet_id) ON DELETE CASCADE
-) ENGINE=InnoDB;
-
-CREATE TABLE user_dietary_preferences (
-                                          user_id INT NOT NULL,
-                                          diet_id INT NOT NULL,
-                                          PRIMARY KEY (user_id, diet_id),
-                                          CONSTRAINT fk_pref_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-                                          CONSTRAINT fk_pref_diet FOREIGN KEY (diet_id) REFERENCES diets(diet_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE plans (
@@ -264,9 +255,6 @@ INSERT INTO recipe_diet_classifications (recipe_id, diet_id) VALUES
 (41, 10), (41, 1), (41, 4), (41, 2), (41, 8),
 (42, 10), (42, 1), (42, 4), (42, 2),
 (43, 10), (43, 1), (43, 4), (43, 2);
-
-INSERT INTO user_dietary_preferences (user_id, diet_id) VALUES
-                                                            (1, 5), (1, 6), (2, 3), (2, 7), (2, 8), (3, 4), (3, 9), (4, 10);
 
 INSERT INTO inventory (user_id, ingredient_id, quantity) VALUES
                                                               (1, 1, 500), (1, 2, 1000), (1, 4, 0.75), (1, 13, 400), (1, 14, 200), (1, 23, 800), (1, 50, 1000), (1, 52, 600),
